@@ -1,0 +1,23 @@
+* org-reverse-datetree
+This library provides a function for creating reverse date trees,
+which is similar to date trees supported by `org-capture' but
+in a reversed order. This is convenient in situation where
+you want to find the latest status of a particular subject
+using a search tool like `helm-org-rifle'.
+
+** Usage
+=org-reverse-date-tree-1= function jumps to today's subtree in an Org buffer. 
+
+The current limitation: An inserted date must be the latest. You cannot insert a date that is older than the latest day in the destination file/buffer.
+
+The format can be customized by setting =org-reverse-date-tree-{year,month,date}-format=.
+
+*** Usage in org-capture
+
+You can create an entry in a reverse date tree using the following template:
+
+#+BEGIN_SRC emacs-lisp
+  ("x" "TEMPLATE-NAME" entry (file+function "~/org/YOUR-FILE.org" org-reverse-date-tree-1)
+   "TEMPLATE-BODY"
+   OPTIONS...)
+#+END_SRC
