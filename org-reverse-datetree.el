@@ -35,29 +35,29 @@
 
 ;;; Code:
 
-(defcustom org-reverse-date-tree-year-format "%Y"
-  "Year format used by org-reverse-date-tree."
+(defcustom org-reverse-datetree-year-format "%Y"
+  "Year format used by org-reverse-datetree."
   :type 'string
-  :group 'org-reverse-date-tree)
+  :group 'org-reverse-datetree)
 
-(defcustom org-reverse-date-tree-month-format "%Y-%m %B"
-  "Month format used by org-reverse-date-tree."
+(defcustom org-reverse-datetree-month-format "%Y-%m %B"
+  "Month format used by org-reverse-datetree."
   :type 'string
-  :group 'org-reverse-date-tree)
+  :group 'org-reverse-datetree)
 
-(defcustom org-reverse-date-tree-week-format "%Y W%W"
-  "Week format used by org-reverse-date-tree.
+(defcustom org-reverse-datetree-week-format "%Y W%W"
+  "Week format used by org-reverse-datetree.
 
 %U is the week number starting on Sunday and %W starting on Monday."
   :type 'string
-  :group 'org-reverse-date-tree)
+  :group 'org-reverse-datetree)
 
-(defcustom org-reverse-date-tree-date-format "%Y-%m-%d %A"
-  "Date format used by org-reverse-date-tree."
+(defcustom org-reverse-datetree-date-format "%Y-%m-%d %A"
+  "Date format used by org-reverse-datetree."
   :type 'string
-  :group 'org-reverse-date-tree)
+  :group 'org-reverse-datetree)
 
-(defun org-reverse-date-tree--find-or-prepend (level text)
+(defun org-reverse-datetree--find-or-prepend (level text)
   "Find or create a heading with the given text at the given level."
   (declare (indent 1))
   (let ((prefix (concat (make-string (org-get-valid-level level) ?*) " "))
@@ -71,7 +71,7 @@
       (insert "\n" prefix text))))
 
 ;;;###autoload
-(cl-defun org-reverse-date-tree-1 (&optional time
+(cl-defun org-reverse-datetree-1 (&optional time
                                              &key week-tree)
   "Jump to the specified date in a reverse date tree.
 
@@ -88,15 +88,15 @@ If WEEK-TREE is non-nil, create a week tree."
     (save-restriction
       (widen)
       (goto-char (point-min))
-      (org-reverse-date-tree--find-or-prepend 1
-        (format-time-string org-reverse-date-tree-year-format time))
-      (org-reverse-date-tree--find-or-prepend 2
+      (org-reverse-datetree--find-or-prepend 1
+        (format-time-string org-reverse-datetree-year-format time))
+      (org-reverse-datetree--find-or-prepend 2
         (format-time-string (if week-tree
-                                org-reverse-date-tree-week-format
-                              org-reverse-date-tree-month-format)
+                                org-reverse-datetree-week-format
+                              org-reverse-datetree-month-format)
                             time))
-      (org-reverse-date-tree--find-or-prepend 3
-        (format-time-string org-reverse-date-tree-date-format time)))))
+      (org-reverse-datetree--find-or-prepend 3
+        (format-time-string org-reverse-datetree-date-format time)))))
 
 (provide 'org-reverse-datetree)
 ;;; org-reverse-datetree.el ends here
