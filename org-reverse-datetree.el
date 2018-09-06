@@ -58,7 +58,9 @@
   :group 'org-reverse-datetree)
 
 (defun org-reverse-datetree--find-or-prepend (level text)
-  "Find or create a heading with the given text at the given level."
+  "Find or create a heading with the given text at the given level.
+
+If a new tree is created, non-nil is returned."
   (declare (indent 1))
   (let ((prefix (concat (make-string (org-get-valid-level level) ?*) " "))
         (bound (unless (= level 1)
@@ -73,7 +75,7 @@
 
 ;;;###autoload
 (cl-defun org-reverse-datetree-1 (&optional time
-                                             &key week-tree)
+                                            &key week-tree)
   "Jump to the specified date in a reverse date tree.
 
 A reverse date tree is a reversed version of the date tree in
@@ -84,7 +86,9 @@ a command like `helm-org-rifle'.
 
 TIME is the date to be inserted. If omitted, it will be today.
 
-If WEEK-TREE is non-nil, create a week tree."
+If WEEK-TREE is non-nil, create a week tree.
+
+If a new tree is created, non-nil is returned."
   (let* ((time (or time (current-time))))
     (save-restriction
       (widen)
