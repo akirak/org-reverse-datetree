@@ -45,6 +45,13 @@
   :type 'string
   :group 'org-reverse-date-tree)
 
+(defcustom org-reverse-date-tree-week-format "%Y W%W"
+  "Week format used by org-reverse-date-tree.
+
+%U is the week number starting on Sunday and %W starting on Monday."
+  :type 'string
+  :group 'org-reverse-date-tree)
+
 (defcustom org-reverse-date-tree-date-format "%Y-%m-%d %A"
   "Date format used by org-reverse-date-tree."
   :type 'string
@@ -74,7 +81,9 @@ This is especially useful for a notes archive, because the latest
 entry on a particular topic is displayed at the top in
 a command like `helm-org-rifle'.
 
-TIME is the date to be inserted. If omitted, it will be today."
+TIME is the date to be inserted. If omitted, it will be today.
+
+If WEEK-TREE is non-nil, create a week tree."
   (let* ((time (or time (current-time))))
     (save-restriction
       (widen)
@@ -82,7 +91,10 @@ TIME is the date to be inserted. If omitted, it will be today."
       (org-reverse-date-tree--find-or-prepend 1
         (format-time-string org-reverse-date-tree-year-format time))
       (org-reverse-date-tree--find-or-prepend 2
-        (format-time-string org-reverse-date-tree-month-format time))
+        (format-time-string (if week-tree
+                                org-reverse-date-tree-week-format
+                              org-reverse-date-tree-month-format)
+                            time))
       (org-reverse-date-tree--find-or-prepend 3
         (format-time-string org-reverse-date-tree-date-format time)))))
 
