@@ -68,7 +68,8 @@
       (if (re-search-forward (concat "^" prefix) bound t)
           (end-of-line 0)
         (end-of-line 1))
-      (insert "\n" prefix text))))
+      (insert "\n" prefix text)
+      text)))
 
 ;;;###autoload
 (cl-defun org-reverse-datetree-1 (&optional time
