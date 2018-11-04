@@ -57,6 +57,13 @@
   :type 'string
   :group 'org-reverse-datetree)
 
+(defcustom org-reverse-datetree-find-function
+  'org-reverse-datetree--find-or-insert
+  "Function used to find a location of a date tree or insert it."
+  :type '(choice (symbol org-reverse-datetree--find-or-insert)
+                 (symbol org-reverse-datetree--find-or-prepend))
+  :group 'org-reverse-datetree)
+
 (defun org-reverse-datetree--find-or-prepend (level text)
   "Find or create a heading with the given text at the given level.
 
@@ -84,6 +91,8 @@ This is especially useful for a notes archive, because the latest
 entry on a particular topic is displayed at the top in
 a command like `helm-org-rifle'.
 
+`org-reverse-datetree-find-function' is used to find or insert trees.
+
 TIME is the date to be inserted. If omitted, it will be today.
 
 If WEEK-TREE is non-nil, create a week tree.
@@ -93,18 +102,24 @@ If a new tree is created, non-nil is returned."
     (save-restriction
       (widen)
       (goto-char (point-min))
-      (org-reverse-datetree--find-or-prepend 1
-        (format-time-string org-reverse-datetree-year-format time))
-      (org-reverse-datetree--find-or-prepend 2
-        (format-time-string (if week-tree
-                                org-reverse-datetree-week-format
-                              org-reverse-datetree-month-format)
-                            time))
-      (org-reverse-datetree--find-or-prepend 3
-        (format-time-string org-reverse-datetree-date-format time)))))
+      (funcall org-reverse-datetree-find-function 1
+               (format-time-string org-reverse-datetree-year-format time))
+      (funcall org-reverse-datetree-find-function 2
+               (format-time-string (if week-tree
+                                       org-reverse-datetree-week-format
+                                     org-reverse-datetree-month-format)
+                                   time))
+      (funcall org-reverse-datetree-find-function 3
+               (format-time-string org-reverse-datetree-date-format time)))))
 
 (defun org-reverse-datetree--find-or-insert (level text)
   "Find or create a heading with the given text at the given level.
+
+LEVEL is the level of a tree, and TEXT is a heading of the tree.
+
+This function uses string comparison to compare the dates in two
+trees. Therefore your date format must be alphabetically ordered,
+e.g. beginning with YYYY(-MM(-DD)).
 
 If a new tree is created, non-nil is returned."
   (declare (indent 1))
@@ -133,37 +148,6 @@ If a new tree is created, non-nil is returned."
       (insert "\n" prefix text)
       (setq created t))
     created))
-
-;;;###autoload
-(cl-defun org-reverse-datetree-2 (&optional time
-                                            &key week-tree)
-  "Jump to the specified date in a reverse date tree.
-
-This function is like `org-reverse-datetree-1' but inserts
-a date tree after an existing tree if the tree is on a newer date than
-the inserted tree.
-
-TIME is the date to be inserted. If omitted, it will be today.
-
-If WEEK-TREE is non-nil, create a week tree.
-
-If a new tree is created, non-nil is returned."
-  (let* ((time (or time (current-time))))
-    (save-restriction
-      (widen)
-      (goto-char (point-min))
-      (org-reverse-datetree--find-or-insert
-       1
-       (format-time-string org-reverse-datetree-year-format time))
-      (org-reverse-datetree--find-or-insert
-       2
-       (format-time-string (if week-tree
-                               org-reverse-datetree-week-format
-                             org-reverse-datetree-month-format)
-                           time))
-      (org-reverse-datetree--find-or-insert
-       3
-       (format-time-string org-reverse-datetree-date-format time)))))
 
 (provide 'org-reverse-datetree)
 ;;; org-reverse-datetree.el ends here
