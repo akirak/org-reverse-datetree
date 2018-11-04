@@ -103,5 +103,67 @@ If a new tree is created, non-nil is returned."
       (org-reverse-datetree--find-or-prepend 3
         (format-time-string org-reverse-datetree-date-format time)))))
 
+(defun org-reverse-datetree--find-or-insert (level text)
+  "Find or create a heading with the given text at the given level.
+
+If a new tree is created, non-nil is returned."
+  (declare (indent 1))
+  (let ((prefix (concat (make-string (org-get-valid-level level) ?*) " "))
+        (bound (unless (= level 1)
+                 (save-excursion (org-end-of-subtree))))
+        created
+        found)
+    (catch 'search
+      (while (re-search-forward (concat "^" (regexp-quote prefix))
+                                bound t)
+        (let ((here (nth 4 (org-heading-components))))
+          (cond
+           ((string-equal here text) (progn
+                                       (end-of-line 1)
+                                       (setq found t)
+                                       (throw 'search t)))
+           ((string< here text) (progn
+                                  (end-of-line 0)
+                                  (insert "\n" prefix text)
+                                  (setq created t
+                                        found t)
+                                  (throw 'search t)))))))
+    (unless found
+      (goto-char (or bound (point-max)))
+      (insert "\n" prefix text)
+      (setq created t))
+    created))
+
+;;;###autoload
+(cl-defun org-reverse-datetree-2 (&optional time
+                                            &key week-tree)
+  "Jump to the specified date in a reverse date tree.
+
+This function is like `org-reverse-datetree-1' but inserts
+a date tree after an existing tree if the tree is on a newer date than
+the inserted tree.
+
+TIME is the date to be inserted. If omitted, it will be today.
+
+If WEEK-TREE is non-nil, create a week tree.
+
+If a new tree is created, non-nil is returned."
+  (let* ((time (or time (current-time))))
+    (save-restriction
+      (widen)
+      (goto-char (point-min))
+      (org-reverse-datetree--find-or-insert
+       1
+       (format-time-string org-reverse-datetree-year-format time))
+      (org-reverse-datetree--find-or-insert
+       2
+       (format-time-string (if week-tree
+                               org-reverse-datetree-week-format
+                             org-reverse-datetree-month-format)
+                           time))
+      (org-reverse-datetree--find-or-insert
+       3
+       (format-time-string org-reverse-datetree-date-format time)))))
+
 (provide 'org-reverse-datetree)
 ;;; org-reverse-datetree.el ends here
