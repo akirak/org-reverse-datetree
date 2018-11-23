@@ -82,7 +82,9 @@ If a new tree is created, non-nil is returned."
 
 ;;;###autoload
 (cl-defun org-reverse-datetree-1 (&optional time
-                                            &key week-tree)
+                                            &key
+                                            week-tree
+                                            return)
   "Jump to the specified date in a reverse date tree.
 
 A reverse date tree is a reversed version of the date tree in
@@ -97,7 +99,21 @@ TIME is the date to be inserted. If omitted, it will be today.
 
 If WEEK-TREE is non-nil, create a week tree.
 
-If a new tree is created, non-nil is returned."
+Depending on the value of RETURN, this function returns the following
+values:
+
+\"'marker\":
+  Returns the marker of the subtree.
+
+\"point\"
+  Returns point of subtree.
+
+\"rfloc\"
+  Returns a refile location spec that can be used as the third
+  argument of `org-refile' function.
+
+\"created\"
+  Returns non-nil if and only if a new tree is created."
   (let* ((time (or time (current-time))))
     (save-restriction
       (widen)
@@ -109,8 +125,18 @@ If a new tree is created, non-nil is returned."
                                        org-reverse-datetree-week-format
                                      org-reverse-datetree-month-format)
                                    time))
-      (funcall org-reverse-datetree-find-function 3
-               (format-time-string org-reverse-datetree-date-format time)))))
+      (let ((new (funcall org-reverse-datetree-find-function 3
+                          (format-time-string org-reverse-datetree-date-format
+                                              time))))
+        (cl-case return
+          ('marker (point-marker))
+          ('point (point))
+          ('rfloc (list (nth 4 (org-heading-components))
+                        (buffer-file-name (or (org-base-buffer (current-buffer))
+                                              (current-buffer)))
+                        nil
+                        (point)))
+          ('created new))))))
 
 (defun org-reverse-datetree--find-or-insert (level text)
   "Find or create a heading with the given text at the given level.
