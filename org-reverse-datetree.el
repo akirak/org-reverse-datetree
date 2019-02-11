@@ -3,8 +3,8 @@
 ;; Copyright (C) 2018 Akira Komamura
 
 ;; Author: Akira Komamura <akira.komamura@gmail.com>
-;; Version: 1.0-pre
-;; Package-Requires: ((emacs "25.1"))
+;; Version: 0.2
+;; Package-Requires: ((emacs "26.1") (dash "2.12"))
 ;; Keywords: outlines
 ;; URL: https://github.com/akirak/org-reverse-datetree
 
@@ -29,11 +29,19 @@
 
 ;; This library provides a function for creating reverse date trees,
 ;; which is similar to date trees supported by `org-capture' but
-;; in a reversed order. This is convenient in situation where
+;; in a reversed order.  This is convenient in situation where
 ;; you want to find the latest status of a particular subject
 ;; using a search tool like `helm-org-rifle'.
 
 ;;; Code:
+
+(require 'org)
+(require 'dash)
+
+(autoload 'org-element-map "org-element")
+(autoload 'org-element-parse-buffer "org-element")
+(autoload 'org-element-property "org-element")
+(autoload 'org-agenda-refile "org-agenda")
 
 (defcustom org-reverse-datetree-year-format "%Y"
   "Year format used by org-reverse-datetree."
@@ -64,8 +72,11 @@
                  (symbol org-reverse-datetree--find-or-prepend))
   :group 'org-reverse-datetree)
 
+(defvar-local org-reverse-datetree--file-headers nil
+  "Alist of headers of the buffer.")
+
 (defun org-reverse-datetree--find-or-prepend (level text)
-  "Find or create a heading with the given text at the given level.
+  "Find or create a heading at a given LEVEL with TEXT.
 
 If a new tree is created, non-nil is returned."
   (declare (indent 1))
@@ -144,7 +155,7 @@ values:
 LEVEL is the level of a tree, and TEXT is a heading of the tree.
 
 This function uses string comparison to compare the dates in two
-trees. Therefore your date format must be alphabetically ordered,
+trees.  Therefore your date format must be alphabetically ordered,
 e.g. beginning with YYYY(-MM(-DD)).
 
 If a new tree is created, non-nil is returned."
@@ -174,6 +185,188 @@ If a new tree is created, non-nil is returned."
       (insert "\n" prefix text)
       (setq created t))
     created))
+
+;;;; Retrieving configuration from the file header
+
+(defun org-reverse-datetree--get-file-headers ()
+  "Get the file headers of the current Org buffer."
+  (let ((buffer-ast (org-with-wide-buffer (org-element-parse-buffer))))
+    (setq org-reverse-datetree--file-headers
+          (org-element-map buffer-ast 'keyword
+            (lambda (keyword)
+              (cons (org-element-property :key keyword)
+                    (org-element-property :value keyword)))))))
+
+(defun org-reverse-datetree--insert-header (key value)
+  "Insert a pair of KEY and VALUE into the file header."
+  (org-with-wide-buffer
+   (goto-char (point-min))
+   (if (re-search-forward (concat (rx bol "#+")
+                                  (regexp-quote key)
+                                  (rx ":" (1+ space)))
+                          (save-excursion
+                            (re-search-forward (rx bol "*") nil t)
+                            (point))
+                          t)
+       (progn
+         (kill-line)
+         (insert value))
+     (when (string-prefix-p "#" (thing-at-point 'line))
+       (forward-line))
+     (insert "#+" key ": " value "\n"))))
+
+(defun org-reverse-datetree--lookup-header (key)
+  "Look up KEY from the file headers stored as a local variable."
+  (cdr (assoc key org-reverse-datetree--file-headers)))
+
+(defun org-reverse-datetree--lookup-bool-header (key prompt)
+  "Look up a boolean file header or ask for a value.
+
+This function looks up KEY from the file headers.  If the key is
+not contained, it asks for a new value with PROMPT, inserts the value
+into the header, and returns the value."
+  (if-let ((value (org-reverse-datetree--lookup-header key)))
+      (pcase value
+        ("t" t)
+        ("nil" nil))
+    (let ((ret (yes-or-no-p prompt)))
+      (org-reverse-datetree--insert-header key (if ret "t" "nil"))
+      ret)))
+
+(defun org-reverse-datetree--lookup-string-header (key prompt initial)
+  "Look up a string file header or ask for a value.
+
+This function looks up KEY from the file headers.  If the key is
+not contained, it asks for a new value with PROMPT with INITIAL
+as the default value, inserts the value, and returns the value."
+  (if-let ((value (org-reverse-datetree--lookup-header key)))
+      (string-trim value)
+    (let ((ret (read-string prompt initial)))
+      (org-reverse-datetree--insert-header key ret)
+      ret)))
+
+;;;###autoload
+(cl-defun org-reverse-datetree-goto-date-in-file (&optional time
+                                                            &key return)
+  "Find or create a heading as configured in the file headers.
+
+This function finds an entry at TIME in a date tree as configured
+by file headers of the buffer.  If there is no such configuration,
+ask the user for a new configuration.  If TIME is omitted, it is
+the current date.  RETURN is the same as in `org-reverse-datetree-1'.
+
+When this function is called interactively, it asks for TIME using
+`org-read-date' and go to an entry of the date."
+  (interactive (list (org-read-date nil t nil) nil))
+  (org-reverse-datetree--get-file-headers)
+  (let* ((use-weektree (org-reverse-datetree--lookup-bool-header
+                        "REVERSE_DATETREE_USE_WEEK_TREE"
+                        "Use a week tree?"))
+         (org-reverse-datetree-year-format
+          (org-reverse-datetree--lookup-string-header
+           "REVERSE_DATETREE_YEAR_FORMAT"
+           "Year format: "
+           org-reverse-datetree-year-format))
+         (org-reverse-datetree-month-format
+          (unless use-weektree
+            (org-reverse-datetree--lookup-string-header
+             "REVERSE_DATETREE_MONTH_FORMAT"
+             "Month format: "
+             org-reverse-datetree-month-format)))
+         (org-reverse-datetree-week-format
+          (when use-weektree
+            (org-reverse-datetree--lookup-string-header
+             "REVERSE_DATETREE_WEEK_FORMAT"
+             "Week format: "
+             org-reverse-datetree-week-format)))
+         (org-reverse-datetree-date-format
+          (org-reverse-datetree--lookup-string-header
+           "REVERSE_DATETREE_DATE_FORMAT"
+           "Date format: "
+           org-reverse-datetree-date-format)))
+    (org-reverse-datetree-1 time
+                            :week-tree use-weektree
+                            :return return)))
+
+(cl-defun org-reverse-datetree-goto-read-date-in-file (&rest args)
+  "Find or create a heading as configured in the file headers.
+
+This function is like `org-reverse-datetree-goto-date-in-file',
+but it always asks for a date even if it is called non-interactively."
+  (interactive)
+  (apply #'org-reverse-datetree-goto-read-date-in-file
+         (org-read-date nil t nil)
+         args))
+
+(defun org-reverse-datetree--timestamp-to-time (s)
+  "Convert timestamp string S into internal time."
+  (apply #'encode-time (org-parse-time-string s)))
+
+(defun org-reverse-datetree--timestamp-from-string (s)
+  "Convert Org timestamp S, as a string, into a timestamp object.
+Return nil if S is not a valid timestamp string."
+  (when (org-string-nw-p s)
+    (with-temp-buffer
+      (save-excursion (insert s))
+      (org-element-timestamp-parser))))
+
+(defun org-reverse-datetree--parse-timestamp-string (s)
+  "Parse a timestamp string S and return a corresponding Emacs time."
+  (org-reverse-datetree--timestamp-to-time
+   (org-reverse-datetree--timestamp-from-string s)))
+
+(cl-defun org-reverse-datetree--get-entry-time (&key ask-always
+                                                     (prefer '("CLOSED")))
+  "Get an Emacs time for the current Org entry.
+
+This function retrieves a timestamp from a property of the entry.
+By default, it checks for the closed date of the entry.
+If there is no value set as the property, it asks for a date using
+`org-read-date' unless if ASK-ALWAYS is non-nil.
+
+You can specify properties to retrieve a timestamp from by
+setting PREFER.  It can be a string or a list of strings.
+If it is a list, the first existing property property is used.
+
+This function returns an Emacs time."
+  (let ((attempt (-some (lambda (property)
+                          (org-entry-get nil property))
+                        (cl-typecase prefer
+                          (list prefer)
+                          (t (list prefer))))))
+    (org-reverse-datetree--parse-timestamp-string
+     (if ask-always
+         (org-read-date nil t nil nil
+                        (org-reverse-datetree--timestamp-from-string attempt))
+       (or attempt
+           (org-read-date nil t nil nil))))))
+
+;;;###autoload
+(cl-defun org-reverse-datetree-refile-to-file (file &optional time
+                                                    &key ask-always prefer)
+  "Refile the current Org entry into a configured date tree in a file.
+
+This function refiles the current entry into a date tree in FILE
+configured in the headers of the file. The same configuration as
+`org-reverse-datetree-goto-date-in-file' is used.
+
+The location in the date tree is specified by TIME, which is an
+Emacs time.  If TIME is not set, a timestamp is retrieved from
+properties of the current entry using
+`org-reverse-datetree--get-entry-time' with ASK-ALWAYS and PREFER
+as arguments."
+  (let* ((mode (derived-mode-p 'org-mode 'org-agenda-mode))
+         (_ (unless mode (user-error "Not in org-mode or org-agenda-mode")))
+         (time (or time
+                   (org-reverse-datetree--get-entry-time :ask-always ask-always
+                                                         :prefer prefer)))
+         (rfloc (with-current-buffer (or (find-buffer-visiting file)
+                                         (find-file-noselect file))
+                  (save-excursion
+                    (org-reverse-datetree-goto-date-in-file time :return 'rfloc)))))
+    (cl-case mode
+      ('org-mode (org-refile nil nil rfloc))
+      ('org-agenda-mode (org-agenda-refile nil nil rfloc)))))
 
 (provide 'org-reverse-datetree)
 ;;; org-reverse-datetree.el ends here
