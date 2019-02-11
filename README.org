@@ -1,3 +1,4 @@
+[[https://travis-ci.org/akirak/org-reverse-datetree][https://travis-ci.org/akirak/org-reverse-datetree.svg?branch=master]]
 * org-reverse-datetree
 This library provides a function for creating reverse date trees,
 which is similar to date trees supported by `org-capture' but
