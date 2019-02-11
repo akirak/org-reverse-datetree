@@ -11,9 +11,9 @@ matrix:
   fast_finish: true
   allow_failures:
   - env: EMACS_VERSION=snapshot
-  - env:EMACS_VERSION=25.1
-  - env:EMACS_VERSION=25.2
-  - env:EMACS_VERSION=25.3
+  - env: EMACS_VERSION=25.1
+  - env: EMACS_VERSION=25.2
+  - env: EMACS_VERSION=25.3
 env:
   global:
   - EMAKE_SHA1=2dec3626e073c3b4aa88fbedd7ad5d27e530f470
