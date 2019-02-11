@@ -1,24 +1,33 @@
 [[https://travis-ci.org/akirak/org-reverse-datetree][https://travis-ci.org/akirak/org-reverse-datetree.svg?branch=master]]
 * org-reverse-datetree
-This library provides a function for creating reverse date trees,
-which is similar to date trees supported by `org-capture' but
-in a reversed order. This is convenient in situation where
-you want to find the latest status of a particular subject
-using a search tool like `helm-org-rifle'.
+This package provides functions for creating and maintaining reverse
+date trees, which are similar to date trees created by built-in
+functions of Org mode (e.g. =org-capture= and =org-archive=) but in a
+reversed order. Since newer contents come first in reverse date trees,
+they are more useful in situations where you want to find latest
+activities on a particular subject using a search tool like
+[[https://github.com/alphapapa/helm-org-rifle][helm-org-rifle]].
 
+** Features
+- Reverse date trees, where latest contents are shown first.
+- You can customize the format of the date tree.
+- Week trees are also supported.
+- Configurations of date trees are stored in file headers, so each file is ensured to have a single date tree with a consistent structure.
+  Configuration is done interactively on first creation.
+** Prerequisites
+- Emacs 26.1
+- dash
 ** Usage
-=org-reverse-datetree-1= function jumps to today's subtree in an Org buffer. 
+The following functions retrieve a configuration from the file header. 
 
-The current limitation: An inserted date must be the latest. You cannot insert a date that is older than the latest day in the destination file/buffer.
+- Use =org-reverse-datetree-goto-date-in-file= to jump to a date in the date tree. If this function is called non-interactively and the time argument is nil, it jumps to the current date. This can be used for =org-capture=.
+- =org-reverse-datetree-goto-read-date-in-file= is similar as above, but it always prompts for a date even if the function is called non-interactively.
+- =org-reverse-datetree-refile-to-file= is a function that refiles the current entry into a date tree. This can be used to build a custom command for refiling an entry to a particular file.
 
-The format can be customized by setting =org-reversedate-tree-{year,month,date}-format=.
-
-*** Usage in org-capture
-
-You can create an entry in a reverse date tree using the following template:
-
-#+BEGIN_SRC emacs-lisp
-  ("x" "TEMPLATE-NAME" entry (file+function "~/org/YOUR-FILE.org" org-reverse-datetree-1)
-   "TEMPLATE-BODY"
-   OPTIONS...)
-#+END_SRC
+You can customize the default format by setting
+=org-reversedate-tree-{year,month,date}-format=.
+Note that the formats should be basically numeric and zero-prefixed, since
+date-tree headings are ordered lexicographically by their texts.
+You should avoid a month format like "Feb" or "February".
+** License
+GPL v3
