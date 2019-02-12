@@ -334,12 +334,13 @@ This function returns an Emacs time."
                         (cl-typecase prefer
                           (list prefer)
                           (t (list prefer))))))
-    (org-reverse-datetree--parse-timestamp-string
-     (if ask-always
-         (org-read-date nil t nil nil
-                        (org-reverse-datetree--timestamp-from-string attempt))
-       (or attempt
-           (org-read-date nil t nil nil))))))
+    (cond
+     (ask-always
+      (org-read-date nil t nil nil
+                     (org-reverse-datetree--timestamp-to-time attempt)))
+     (attempt
+      (org-reverse-datetree--timestamp-to-time attempt))
+     (t (org-read-date nil t nil nil)))))
 
 ;;;###autoload
 (cl-defun org-reverse-datetree-refile-to-file (file &optional time
