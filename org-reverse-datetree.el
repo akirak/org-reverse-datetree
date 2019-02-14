@@ -366,7 +366,11 @@ as arguments."
                   (save-excursion
                     (org-reverse-datetree-goto-date-in-file time :return 'rfloc)))))
     (cl-case mode
-      ('org-mode (org-refile nil nil rfloc))
+      ('org-mode (if (org-region-active-p)
+                     ;; TODO: Add support for refiling multiple entries
+                     (error "Refiling multiple entries is unsupported now")
+                   (org-refile nil nil rfloc)))
+      ;; TODO: Add support for batch refiling
       ('org-agenda-mode (org-agenda-refile nil nil rfloc)))))
 
 (provide 'org-reverse-datetree)
