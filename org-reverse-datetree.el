@@ -342,6 +342,29 @@ This function returns an Emacs time."
       (org-reverse-datetree--timestamp-to-time attempt))
      (t (org-read-date nil t nil nil)))))
 
+(cl-defun org-reverse-datetree--refile-to-file (file &optional time
+                                                     &key ask-always prefer)
+  "Refile the current single Org entry.
+
+This is used inside `org-reverse-datetree-refile-to-file' to
+refile a single tree.
+FILE, TIME, ASK-ALWAYS, and PREFER are the same as in the function.
+
+Return a string describing the operation."
+  (let* ((time (or time
+                   (org-reverse-datetree--get-entry-time
+                    :ask-always ask-always
+                    :prefer prefer)))
+         (rfloc (with-current-buffer
+                    (or (find-buffer-visiting file)
+                        (find-file-noselect file))
+                  (save-excursion
+                    (org-reverse-datetree-goto-date-in-file
+                     time :return 'rfloc))))
+         (heading (nth 4 (org-heading-components))))
+    (org-refile nil nil rfloc)
+    (format "\"%s\" -> %s" heading (car rfloc))))
+
 ;;;###autoload
 (cl-defun org-reverse-datetree-refile-to-file (file &optional time
                                                     &key ask-always prefer)
@@ -356,22 +379,99 @@ Emacs time.  If TIME is not set, a timestamp is retrieved from
 properties of the current entry using
 `org-reverse-datetree--get-entry-time' with ASK-ALWAYS and PREFER
 as arguments."
-  (let* ((mode (derived-mode-p 'org-mode 'org-agenda-mode))
-         (_ (unless mode (user-error "Not in org-mode or org-agenda-mode")))
-         (time (or time
-                   (org-reverse-datetree--get-entry-time :ask-always ask-always
-                                                         :prefer prefer)))
-         (rfloc (with-current-buffer (or (find-buffer-visiting file)
-                                         (find-file-noselect file))
-                  (save-excursion
-                    (org-reverse-datetree-goto-date-in-file time :return 'rfloc)))))
-    (cl-case mode
-      ('org-mode (if (org-region-active-p)
-                     ;; TODO: Add support for refiling multiple entries
-                     (error "Refiling multiple entries is unsupported now")
-                   (org-refile nil nil rfloc)))
-      ;; TODO: Add support for batch refiling
-      ('org-agenda-mode (org-agenda-refile nil nil rfloc)))))
+  (pcase (derived-mode-p 'org-mode 'org-agenda-mode)
+    ('org-mode
+     (if (org-region-active-p)
+         (let ((region-start (region-beginning))
+               (region-end (region-end))
+               (org-refile-active-region-within-subtree nil)
+               subtree-end
+               msgs)
+           (org-with-wide-buffer
+            (when (file-equal-p file (buffer-file-name))
+              (user-error "Can't refile to the same file"))
+            (deactivate-mark)
+            (goto-char region-start)
+            (org-back-to-heading)
+            (setq region-start (point))
+            (while region-start
+              (unless (org-at-heading-p)
+                (org-next-visible-heading 1))
+              (setq subtree-end (save-excursion
+                                  (org-end-of-subtree)
+                                  (point)))
+              (push (org-reverse-datetree--refile-to-file
+                     file time :ask-always ask-always :prefer prefer)
+                    msgs)
+              (if (<= region-end subtree-end)
+                  (setq region-start nil)
+                (let ((len (- subtree-end region-start)))
+                  (setq region-end (- region-end len))
+                  (goto-char region-start)))))
+           (let ((message-log-max nil))
+             (message (format "Refiled to %s:\n%s"
+                              file
+                              (string-join (nreverse msgs) "\n")))))
+       (org-reverse-datetree--refile-to-file
+        file time :ask-always ask-always :prefer prefer)))
+    ('org-agenda-mode
+     (if org-agenda-bulk-marked-entries
+         (dolist (group (seq-group-by #'marker-buffer
+                                      org-agenda-bulk-marked-entries))
+           (let ((processed 0)
+                 (skipped 0)
+                 (d 0)
+                 msgs)
+             (dolist (e (cl-sort (cdr group) (lambda (a b)
+                                               (< (marker-position a)
+                                                  (marker-position b)))))
+               (let ((pos (text-property-any (point-min) (point-max) 'org-hd-marker e))
+                     org-loop-over-headlines-in-active-region)
+                 (if (not pos)
+                     (progn
+                       (message "Skipped removed entry")
+                       (cl-incf skipped))
+                   (goto-char pos)
+                   (let* ((buffer-orig (buffer-name))
+                          (marker (or (org-get-at-bol 'org-hd-marker)
+                                      (org-agenda-error))))
+                     (with-current-buffer (marker-buffer marker)
+                       (org-with-wide-buffer
+                        (goto-char (- (marker-position marker) d))
+                        (let ((org-agenda-buffer-name buffer-orig))
+                          (org-remove-subtree-entries-from-agenda))
+                        (setq d (+ d (- (save-excursion
+                                          (org-end-of-subtree)
+                                          (point))
+                                        (point))))
+                        (push (org-reverse-datetree--refile-to-file
+                               file time :ask-always ask-always :prefer prefer)
+                              msgs))))
+                   ;; `post-command-hook' is not run yet.  We make sure any
+                   ;; pending log note is processed.
+                   (when (or (memq 'org-add-log-note (default-value 'post-command-hook))
+                             (memq 'org-add-log-note post-command-hook))
+                     (org-add-log-note))
+                   (cl-incf processed))))
+             (unless org-agenda-persistent-marks (org-agenda-bulk-unmark-all))
+             (org-agenda-redo)
+             (message "Refiled %d entries to %s%s\n%s"
+                      processed file
+                      (if (= skipped 0)
+                          ""
+                        (format ", skipped %d" skipped))
+                      (string-join (nreverse msgs) "\n"))))
+       (let* ((buffer-orig (buffer-name))
+              (marker (or (org-get-at-bol 'org-hd-marker)
+                          (org-agenda-error))))
+         (with-current-buffer (marker-buffer marker)
+           (org-with-wide-buffer
+            (goto-char (marker-position marker))
+            (let ((org-agenda-buffer-name buffer-orig))
+              (org-remove-subtree-entries-from-agenda))
+            (org-reverse-datetree--refile-to-file
+             file time :ask-always ask-always :prefer prefer))))))
+    (_ (user-error "Not in org-mode or org-agenda-mode"))))
 
 (provide 'org-reverse-datetree)
 ;;; org-reverse-datetree.el ends here
