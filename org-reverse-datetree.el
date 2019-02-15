@@ -41,7 +41,13 @@
 (autoload 'org-element-map "org-element")
 (autoload 'org-element-parse-buffer "org-element")
 (autoload 'org-element-property "org-element")
-(autoload 'org-agenda-refile "org-agenda")
+(defvar org-agenda-buffer-name)
+(defvar org-agenda-bulk-marked-entries)
+(defvar org-agenda-persistent-marks)
+(autoload 'org-agenda-error "org-agenda")
+(autoload 'org-agenda-bulk-unmark-all "org-agenda")
+(autoload 'org-agenda-redo "org-agenda")
+(autoload 'org-remove-subtree-entries-from-agenda "org-agenda")
 
 (defcustom org-reverse-datetree-year-format "%Y"
   "Year format used by org-reverse-datetree."
@@ -432,14 +438,11 @@ as arguments."
                        (message "Skipped removed entry")
                        (cl-incf skipped))
                    (goto-char pos)
-                   (let* ((buffer-orig (buffer-name))
-                          (marker (or (org-get-at-bol 'org-hd-marker)
+                   (let* ((marker (or (org-get-at-bol 'org-hd-marker)
                                       (org-agenda-error))))
                      (with-current-buffer (marker-buffer marker)
                        (org-with-wide-buffer
                         (goto-char (- (marker-position marker) d))
-                        (let ((org-agenda-buffer-name buffer-orig))
-                          (org-remove-subtree-entries-from-agenda))
                         (setq d (+ d (- (save-excursion
                                           (org-end-of-subtree)
                                           (point))
@@ -467,7 +470,8 @@ as arguments."
          (with-current-buffer (marker-buffer marker)
            (org-with-wide-buffer
             (goto-char (marker-position marker))
-            (let ((org-agenda-buffer-name buffer-orig))
+            (let* (lexical-binding
+                   (org-agenda-buffer-name buffer-orig))
               (org-remove-subtree-entries-from-agenda))
             (org-reverse-datetree--refile-to-file
              file time :ask-always ask-always :prefer prefer))))))
