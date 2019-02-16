@@ -1,12 +1,14 @@
 [[https://travis-ci.org/akirak/org-reverse-datetree][https://travis-ci.org/akirak/org-reverse-datetree.svg?branch=master]]
 * org-reverse-datetree
-This package provides functions for creating and maintaining reverse
+This package provides functions for creating reverse
 date trees, which are similar to date trees created by built-in
 functions of Org mode (e.g. =org-capture= and =org-archive=) but in a
 reversed order. Since newer contents come first in reverse date trees,
 they are more useful in situations where you want to find latest
 activities on a particular subject using a search tool like
 [[https://github.com/alphapapa/helm-org-rifle][helm-org-rifle]].
+
+[[file:screenshots/org-reverse-datetree-1.png]]
 
 ** Features
 - Reverse date trees, where latest contents are shown first.
@@ -18,16 +20,76 @@ activities on a particular subject using a search tool like
 - Emacs 26.1
 - dash
 ** Usage
-The following functions retrieve a configuration from the file header. 
+The following functions retrieve a configuration from the file header:
 
 - Use =org-reverse-datetree-goto-date-in-file= to jump to a date in the date tree. If this function is called non-interactively and the time argument is nil, it jumps to the current date. This can be used for =org-capture=.
 - =org-reverse-datetree-goto-read-date-in-file= is similar as above, but it always prompts for a date even if the function is called non-interactively.
 - =org-reverse-datetree-refile-to-file= is a function that refiles the current entry into a date tree. This can be used to build a custom command for refiling an entry to a particular file.
+*** Configuring date formats
+The format configuration is stored in the file header of each Org file, as shown in the following example:
+
+#+begin_src org
+  ,#+REVERSE_DATETREE_DATE_FORMAT: %Y-%m-%d %A
+  ,#+REVERSE_DATETREE_WEEK_FORMAT: %Y W%W
+  ,#+REVERSE_DATETREE_YEAR_FORMAT: %Y
+  ,#+REVERSE_DATETREE_USE_WEEK_TREE: t
+#+end_src
+
+These attributes are added by functions in this package on initial creation of the date tree, so you usually don't have to manually edit them.
 
 You can customize the default format by setting
 =org-reversedate-tree-{year,month,date}-format=.
 Note that the formats should be basically numeric and zero-prefixed, since
 date-tree headings are ordered lexicographically by their texts.
-You should avoid a month format like "Feb" or "February".
+You should avoid a month format containing a string like "Feb" or "February".
+
+*** Defining a capture template
+You can define an =org-capture= template which inserts an entry into a date tree with [[https://github.com/akirak/org-starter][org-starter]] package as follows:
+
+#+begin_src emacs-lisp
+(org-starter-def-capture "p"
+  "Commonplace book plain entry"
+  entry
+  (file+function "cpb.org" org-reverse-datetree-goto-date-in-file)
+  "* %?"
+  :clock-in t :clock-resume t :empty-lines 1)
+#+end_src
+
+*** Jumping to a particular date
+Use =org-reverse-datetree-goto-date-in-file= command to jump to a particular date in the date tree of the current file.
+
+*** Defining a refile function
+With =org-reverse-datetree-refile-to-file=, you can define a function which can be used to refile entries to the date tree in a particular file:
+
+#+begin_src emacs-lisp
+  (defun akirak/org-refile-to-cpb (arg)
+    (interactive "P")
+    (org-reverse-datetree-refile-to-file
+     (org-starter-locate-file "cpb.org" nil t) nil
+     :ask-always arg :prefer '("CREATED_TIME" "CREATED_AT" "CLOSED")))
+#+end_src
+
+The heading properties given as =:prefer= to the function are used to determine the date of an entry.
+
+You can use this function both in =org-mode= (either on a single entry or on multiple entries under selection) and in =org-agenda-mode= (either on a single entry or on bulk entries). It retrieves a date for each entry if it operates on multiple entries.
+
+=org-starter-locate-file= is a function from org-starter package, which locates the location of an Org file. If you don't use the package, you should give an absolute path:
+
+#+begin_src emacs-lisp
+  (defun akirak/org-refile-to-cpb (arg)
+    (interactive "P")
+    (org-reverse-datetree-refile-to-file
+     "~/org/cpb.org" nil
+     :ask-always arg :prefer '("CREATED_TIME" "CREATED_AT" "CLOSED")))
+#+end_src
+
+A recommended way to invoke this command is to add an entry to =org-starter-extra-refile-map= in org-starter package:
+
+#+begin_src emacs-lisp
+  (add-to-list 'org-starter-extra-refile-map
+               '("p" akirak/org-refile-to-cpb "cpb"))
+#+end_src
+
+Then you can run =org-starter-refile-by-key= and press ~p~ key to refile the selected entries to =cpb.org=.
 ** License
 GPL v3
