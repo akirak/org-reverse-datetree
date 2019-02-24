@@ -36,6 +36,10 @@
 ;;; Code:
 
 (require 'org)
+(require 'subr-x)
+(require 'seq)
+(require 'cl-lib)
+(require 'cl-macs)
 (require 'dash)
 
 (autoload 'org-element-map "org-element")
