@@ -300,7 +300,7 @@ When this function is called interactively, it asks for TIME using
 This function is like `org-reverse-datetree-goto-date-in-file',
 but it always asks for a date even if it is called non-interactively."
   (interactive)
-  (apply #'org-reverse-datetree-goto-read-date-in-file
+  (apply #'org-reverse-datetree-goto-date-in-file
          (org-read-date nil t nil)
          args))
 
