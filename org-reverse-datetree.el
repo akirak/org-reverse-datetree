@@ -388,6 +388,7 @@ Emacs time.  If TIME is not set, a timestamp is retrieved from
 properties of the current entry using
 `org-reverse-datetree--get-entry-time' with ASK-ALWAYS and PREFER
 as arguments."
+  ;; NOTE: Based on org 9.3. Maybe needs updating in the future
   (pcase (derived-mode-p 'org-mode 'org-agenda-mode)
     ('org-mode
      (if (org-region-active-p)
