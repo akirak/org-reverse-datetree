@@ -266,7 +266,8 @@ the current date.  RETURN is the same as in `org-reverse-datetree-1'.
 
 When this function is called interactively, it asks for TIME using
 `org-read-date' and go to an entry of the date."
-  (interactive (list (org-read-date nil t nil) nil))
+  (interactive (list (org-read-date nil t nil)
+                     :return nil))
   (org-reverse-datetree--get-file-headers)
   (let* ((use-weektree (org-reverse-datetree--lookup-bool-header
                         "REVERSE_DATETREE_USE_WEEK_TREE"
