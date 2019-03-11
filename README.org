@@ -1,5 +1,7 @@
-[[https://travis-ci.org/akirak/org-reverse-datetree][https://travis-ci.org/akirak/org-reverse-datetree.svg?branch=master]]
 * org-reverse-datetree
+[[https://melpa.org/#/org-reverse-datetree][https://melpa.org/packages/org-reverse-datetree-badge.svg]]
+[[https://travis-ci.org/akirak/org-reverse-datetree][https://travis-ci.org/akirak/org-reverse-datetree.svg?branch=master]]
+
 This package provides functions for creating reverse
 date trees, which are similar to date trees created by built-in
 functions of Org mode (e.g. =org-capture= and =org-archive=) but in a
@@ -9,6 +11,19 @@ activities on a particular subject using a search tool like
 [[https://github.com/alphapapa/helm-org-rifle][helm-org-rifle]].
 
 [[file:screenshots/org-reverse-datetree-1.png]]
+
+** Table of contents
+:PROPERTIES:
+:TOC:      siblings
+:END:
+    -  [[#features][Features]]
+    -  [[#prerequisites][Prerequisites]]
+    -  [[#usage][Usage]]
+      -  [[#configuring-date-formats][Configuring date formats]]
+      -  [[#defining-a-capture-template][Defining a capture template]]
+      -  [[#jumping-to-a-particular-date][Jumping to a particular date]]
+      -  [[#defining-a-refile-function][Defining a refile function]]
+    -  [[#license][License]]
 
 ** Features
 - Reverse date trees, where latest contents are shown first.
@@ -93,3 +108,6 @@ A recommended way to invoke this command is to add an entry to =org-starter-extr
 Then you can run =org-starter-refile-by-key= and press ~p~ key to refile the selected entries to =cpb.org=.
 ** License
 GPL v3
+# Local Variables:
+# before-save-hook: org-make-toc
+# End:
