@@ -84,8 +84,12 @@
 (defvar-local org-reverse-datetree--file-headers nil
   "Alist of headers of the buffer.")
 
-(defun org-reverse-datetree--find-or-prepend (level text)
+(cl-defun org-reverse-datetree--find-or-prepend (level text
+                                                       &key append-newline)
   "Find or create a heading at a given LEVEL with TEXT.
+
+If APPEND-NEWLINE is non-nil, a newline is appended to the
+inserted text.
 
 If a new tree is created, non-nil is returned."
   (declare (indent 1))
@@ -97,7 +101,9 @@ If a new tree is created, non-nil is returned."
       (if (re-search-forward (concat "^" prefix) bound t)
           (end-of-line 0)
         (end-of-line 1))
-      (insert "\n" prefix text)
+      (insert (concat "\n" prefix text
+                      (when append-newline
+                        "\n")))
       text)))
 
 ;;;###autoload
@@ -139,12 +145,14 @@ values:
       (widen)
       (goto-char (point-min))
       (funcall org-reverse-datetree-find-function 1
-               (format-time-string org-reverse-datetree-year-format time))
+               (format-time-string org-reverse-datetree-year-format time)
+               :append-newline t)
       (funcall org-reverse-datetree-find-function 2
                (format-time-string (if week-tree
                                        org-reverse-datetree-week-format
                                      org-reverse-datetree-month-format)
-                                   time))
+                                   time)
+               :append-newline t)
       (let ((new (funcall org-reverse-datetree-find-function 3
                           (format-time-string org-reverse-datetree-date-format
                                               time))))
@@ -158,10 +166,14 @@ values:
                         (point)))
           ('created new))))))
 
-(defun org-reverse-datetree--find-or-insert (level text)
+(cl-defun org-reverse-datetree--find-or-insert (level text
+                                                      &key append-newline)
   "Find or create a heading with the given text at the given level.
 
 LEVEL is the level of a tree, and TEXT is a heading of the tree.
+
+If APPEND-NEWLINE is non-nil, a newline is appended to the
+inserted text.
 
 This function uses string comparison to compare the dates in two
 trees.  Therefore your date format must be alphabetically ordered,
@@ -191,7 +203,9 @@ If a new tree is created, non-nil is returned."
                                   (throw 'search t)))))))
     (unless found
       (goto-char (or bound (point-max)))
-      (insert "\n" prefix text)
+      (insert (concat "\n" prefix text
+                      (when append-newline
+                        "\n")))
       (setq created t))
     created))
 
