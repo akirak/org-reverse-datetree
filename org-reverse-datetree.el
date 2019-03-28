@@ -140,6 +140,8 @@ values:
 
 \"created\"
   Returns non-nil if and only if a new tree is created."
+  (unless (derived-mode-p 'org-mode)
+    (user-error "Not in org-mode"))
   (let* ((time (or time (current-time))))
     (save-restriction
       (widen)
@@ -282,6 +284,8 @@ When this function is called interactively, it asks for TIME using
 `org-read-date' and go to an entry of the date."
   (interactive (list (org-read-date nil t nil)
                      :return nil))
+  (unless (derived-mode-p 'org-mode)
+    (user-error "Not in org-mode"))
   (org-reverse-datetree--get-file-headers)
   (let* ((use-weektree (org-reverse-datetree--lookup-bool-header
                         "REVERSE_DATETREE_USE_WEEK_TREE"
