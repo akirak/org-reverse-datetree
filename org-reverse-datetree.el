@@ -320,7 +320,7 @@ but it always asks for a date even if it is called non-interactively."
   (interactive)
   (apply #'org-reverse-datetree-goto-date-in-file
          (org-read-date nil t nil)
-         args))
+         (cdr args)))
 
 (defun org-reverse-datetree--timestamp-to-time (s)
   "Convert timestamp string S into internal time."
