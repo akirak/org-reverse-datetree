@@ -189,10 +189,8 @@ If a new tree is created, non-nil is returned."
         created
         found)
     (catch 'search
-      (while (and bound
-                  (> bound (point))
-                  (re-search-forward (concat "^" (regexp-quote prefix))
-                                     bound t))
+      (while (re-search-forward (concat "^" (regexp-quote prefix))
+                                bound t)
         (let ((here (nth 4 (org-heading-components))))
           (cond
            ((string-equal here text) (progn
