@@ -187,30 +187,34 @@ If a new tree is created, non-nil is returned."
         (bound (unless (= level 1)
                  (save-excursion (org-end-of-subtree))))
         created
-        found)
-    (catch 'search
-      (while (and (or (not bound)
-                      (> bound (point)))
-                  (re-search-forward (concat "^" (regexp-quote prefix))
-                                     bound t))
-        (let ((here (nth 4 (org-heading-components))))
-          (cond
-           ((string-equal here text) (progn
-                                       (end-of-line 1)
-                                       (setq found t)
-                                       (throw 'search t)))
-           ((string< here text) (progn
-                                  (end-of-line 0)
-                                  (insert "\n" prefix text)
-                                  (setq created t
-                                        found t)
-                                  (throw 'search t)))))))
-    (unless found
-      (goto-char (or bound (point-max)))
-      (insert (concat "\n" prefix text
-                      (when append-newline
-                        "\n")))
-      (setq created t))
+        found
+        pos)
+    (org-with-wide-buffer
+     (catch 'search
+       (while (and (or (not bound)
+                       (> bound (point)))
+                   (re-search-forward (concat "^" (regexp-quote prefix))
+                                      bound t))
+         (let ((here (nth 4 (org-heading-components))))
+           (cond
+            ((string-equal here text) (progn
+                                        (end-of-line 1)
+                                        (setq found t)
+                                        (throw 'search t)))
+            ((string< here text) (progn
+                                   (end-of-line 0)
+                                   (insert "\n" prefix text)
+                                   (setq created t
+                                         found t)
+                                   (throw 'search t)))))))
+     (unless found
+       (goto-char (or bound (point-max)))
+       (insert (concat "\n" prefix text
+                       (when append-newline
+                         "\n")))
+       (setq created t))
+     (setq pos (point)))
+    (goto-char pos)
     created))
 
 ;;;; Retrieving configuration from the file header
