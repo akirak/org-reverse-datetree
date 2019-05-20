@@ -502,5 +502,35 @@ as arguments."
              file time :ask-always ask-always :prefer prefer))))))
     (_ (user-error "Not in org-mode or org-agenda-mode"))))
 
+;;;; Maintenance commands
+
+;;;###autoload
+(defun org-reverse-datetree-cleanup-empty-dates ()
+  "Delete empty date entries in the buffer."
+  (interactive)
+  (unless (derived-mode-p 'org-mode)
+    (user-error "Not in org-mode"))
+  (let ((search-spaces-regexp (rx (+ (any " \t\r\n")))))
+    (when (yes-or-no-p "Start from the beginning?")
+      (goto-char (point-min)))
+    (while (re-search-forward (rx (group bol "*** " (* nonl) (* space) "\n")
+                                  "*** ")
+                              nil t)
+      (goto-char (match-beginning 1))
+      (push-mark (match-end 1))
+      (setq mark-active t)
+      (when (yes-or-no-p "Delete this empty date?")
+        (call-interactively #'delete-region)))
+    (when (yes-or-no-p "Delete empty week/month entries from the beginning as well?")
+      (goto-char (point-min))
+      (while (re-search-forward (rx (group bol "** " (* nonl) (* space) "\n")
+                                    "** ")
+                                nil t)
+        (goto-char (match-beginning 1))
+        (push-mark (match-end 1))
+        (setq mark-active t)
+        (when (yes-or-no-p "Delete this empty entry?")
+          (call-interactively #'delete-region))))))
+
 (provide 'org-reverse-datetree)
 ;;; org-reverse-datetree.el ends here
