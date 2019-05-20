@@ -532,5 +532,46 @@ as arguments."
         (when (yes-or-no-p "Delete this empty entry?")
           (call-interactively #'delete-region))))))
 
+(defun org-reverse-datetree-validate-structure ()
+  (interactive)
+  (org-reverse-datetree--get-file-headers)
+  (let* ((use-weektree (org-reverse-datetree--lookup-bool-header
+                        "REVERSE_DATETREE_USE_WEEK_TREE"
+                        "Use a week tree?"))
+         (org-reverse-datetree-year-format
+          (org-reverse-datetree--lookup-string-header
+           "REVERSE_DATETREE_YEAR_FORMAT"
+           "Year format: "
+           org-reverse-datetree-year-format))
+         (org-reverse-datetree-month-format
+          (unless use-weektree
+            (org-reverse-datetree--lookup-string-header
+             "REVERSE_DATETREE_MONTH_FORMAT"
+             "Month format: "
+             org-reverse-datetree-month-format)))
+         (org-reverse-datetree-week-format
+          (when use-weektree
+            (org-reverse-datetree--lookup-string-header
+             "REVERSE_DATETREE_WEEK_FORMAT"
+             "Week format: "
+             org-reverse-datetree-week-format)))
+         (org-reverse-datetree-date-format
+          (org-reverse-datetree--lookup-string-header
+           "REVERSE_DATETREE_DATE_FORMAT"
+           "Date format: "
+           org-reverse-datetree-date-format)))
+    (let (l1 l2)
+      (while (re-search-forward (rx bol "*") nil t)
+        (pcase (thing-at-point 'line t)
+          ((pred (string-prefix-p "* "))
+           (setq l1 (nth 4 (org-heading-components)))
+           (parse-time-string l1)
+           )
+          ((pred (string-prefix-p "** "))
+           (setq l2 (nth 4 (org-heading-components)))
+           )
+          ((pred (string-prefix-p "*** "))
+           ))))))
+
 (provide 'org-reverse-datetree)
 ;;; org-reverse-datetree.el ends here
