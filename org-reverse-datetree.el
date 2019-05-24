@@ -52,6 +52,11 @@
 (autoload 'org-agenda-redo "org-agenda")
 (autoload 'org-remove-subtree-entries-from-agenda "org-agenda")
 
+(defgroup org-reverse-datetree nil
+  "Reverse date trees for Org mode."
+  :group 'org
+  :prefix "org-reverse-datetree-")
+
 (defcustom org-reverse-datetree-year-format "%Y"
   "Year format used by org-reverse-datetree."
   :type 'string
