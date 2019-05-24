@@ -243,9 +243,7 @@ If a new tree is created, non-nil is returned."
                     (org-element-property :value keyword)))))))
 
 (defun org-reverse-datetree--insert-header (key value)
-  "Insert a pair of KEY and VALUE into the file header.
-
-Return VALUE."
+  "Insert a pair of KEY and VALUE into the file header."
   (org-with-wide-buffer
    (goto-char (point-min))
    (if (re-search-forward (concat (rx bol "#+")
