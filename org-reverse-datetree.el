@@ -54,24 +54,24 @@
 
 (defcustom org-reverse-datetree-year-format "%Y"
   "Year format used by org-reverse-datetree."
-  :type 'string
+  :type '(choice string function)
   :group 'org-reverse-datetree)
 
 (defcustom org-reverse-datetree-month-format "%Y-%m %B"
   "Month format used by org-reverse-datetree."
-  :type 'string
+  :type '(choice string function)
   :group 'org-reverse-datetree)
 
 (defcustom org-reverse-datetree-week-format "%Y W%W"
   "Week format used by org-reverse-datetree.
 
 %U is the week number starting on Sunday and %W starting on Monday."
-  :type 'string
+  :type '(choice string function)
   :group 'org-reverse-datetree)
 
 (defcustom org-reverse-datetree-date-format "%Y-%m-%d %A"
   "Date format used by org-reverse-datetree."
-  :type 'string
+  :type '(choice string function)
   :group 'org-reverse-datetree)
 
 (defcustom org-reverse-datetree-find-function
@@ -129,6 +129,14 @@ If a new tree is created, non-nil is returned."
                         "\n")))
       text)))
 
+(defun org-reverse-datetree--apply-format (format time)
+  "Apply date FORMAT to TIME to produce a string.
+
+The format can be either a function or a string."
+  (cl-etypecase format
+    (string (format-time-string format time))
+    (function (funcall format time))))
+
 ;;;###autoload
 (defun org-reverse-datetree-2 (time level-formats return-type)
   "Jump to the specified date in a reverse date tree.
@@ -163,10 +171,10 @@ following values:
                                            (-butlast level-formats))
              do (funcall org-reverse-datetree-find-function
                          level
-                         (format-time-string format time)
+                         (org-reverse-datetree--apply-format format time)
                          :append-newline t))
     (let ((new (funcall org-reverse-datetree-find-function (length level-formats)
-                        (format-time-string (-last-item level-formats) time))))
+                        (org-reverse-datetree--apply-format (-last-item level-formats) time))))
       (cl-case return-type
         ('marker (point-marker))
         ('point (point))
@@ -336,6 +344,33 @@ into the header, and returns the value."
                                                      (month-and-week "month-and-week")))
               value)))))
 
+(defun org-reverse-datetree--parse-format (raw)
+  "Parse a RAW time format string in the header.
+
+If the first character of the string is either a single quotation
+or an open parenthesis, it is read as a function.  Otherwise, it
+is a string passed to `format-time-string' as the first argument."
+  (unless (stringp raw)
+    (user-error "Must be a string: %s" raw))
+  (cond
+   ((string-match (rx bol (any "'(")) raw)
+    (read raw))
+   (t
+    raw)))
+
+(defun org-reverse-datetree--lookup-format-header (key prompt initial)
+  "Look up a string file header or ask for a value.
+
+This function looks up KEY from the file headers.  If the key is
+not contained, it asks for a new value with PROMPT with INITIAL
+as the default value, inserts the value, and returns the value."
+  (if-let ((value (org-reverse-datetree--lookup-header key)))
+      (org-reverse-datetree--parse-format (string-trim value))
+    (let* ((raw (read-string prompt initial))
+           (ret (org-reverse-datetree--parse-format raw)))
+      (org-reverse-datetree--insert-header key raw)
+      ret)))
+
 (defun org-reverse-datetree--lookup-string-header (key prompt initial)
   "Look up a string file header or ask for a value.
 
@@ -370,24 +405,24 @@ When this function is called interactively, it asks for TIME using
     (org-reverse-datetree--get-file-headers)
     (let* ((type (org-reverse-datetree--lookup-type-header-1))
            (org-reverse-datetree-year-format
-            (org-reverse-datetree--lookup-string-header
+            (org-reverse-datetree--lookup-format-header
              "REVERSE_DATETREE_YEAR_FORMAT"
              "Year format: "
              org-reverse-datetree-year-format))
            (org-reverse-datetree-month-format
             (when (memq type '(month month-and-week))
-              (org-reverse-datetree--lookup-string-header
+              (org-reverse-datetree--lookup-format-header
                "REVERSE_DATETREE_MONTH_FORMAT"
                "Month format: "
                org-reverse-datetree-month-format)))
            (org-reverse-datetree-week-format
             (when (memq type '(week month-and-week))
-              (org-reverse-datetree--lookup-string-header
+              (org-reverse-datetree--lookup-format-header
                "REVERSE_DATETREE_WEEK_FORMAT"
                "Week format: "
                org-reverse-datetree-week-format)))
            (org-reverse-datetree-date-format
-            (org-reverse-datetree--lookup-string-header
+            (org-reverse-datetree--lookup-format-header
              "REVERSE_DATETREE_DATE_FORMAT"
              "Date format: "
              org-reverse-datetree-date-format))
