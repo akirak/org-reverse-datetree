@@ -615,6 +615,25 @@ as arguments."
              file time :ask-always ask-always :prefer prefer))))))
     (_ (user-error "Not in org-mode or org-agenda-mode"))))
 
+;;;; Utility functions for defining formats
+(defun org-reverse-datetree-monday (&optional time)
+  "Get Monday in the same week as TIME."
+  (org-reverse-datetree-last-dow 1 time))
+
+(defun org-reverse-datetree-sunday (&optional time)
+  "Get Sunday in the same week as TIME."
+  (org-reverse-datetree-last-dow 0 time))
+
+(defun org-reverse-datetree-last-dow (n &optional time)
+  "Get the date on N-th day of week in the same week as TIME."
+  (let* ((time (or time (current-time)))
+         (x (- (org-reverse-datetree--dow time) n)))
+    (time-add time (- (* 86400 (if (>= x 0) x (+ x 7)))))))
+
+(defun org-reverse-datetree--dow (time)
+  "Get the day of week of TIME."
+  (nth 6 (decode-time time)))
+
 ;;;; Maintenance commands
 
 ;;;###autoload
