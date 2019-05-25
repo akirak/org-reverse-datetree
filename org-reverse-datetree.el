@@ -81,6 +81,29 @@
                  (symbol org-reverse-datetree--find-or-prepend))
   :group 'org-reverse-datetree)
 
+(defcustom org-reverse-datetree-level-formats nil
+  "List of formats for date trees.
+
+This setting affects the behavior of
+`org-reverse-datetree-goto-date-in-file' and
+`org-reverse-datetree-goto-read-date-in-file'.
+
+Each item in this variable corresponds to each level in date
+trees. Note that this variable is buffer-local, so you can set it
+either as a file-local variable or as a directory-local variable.
+
+If this variable is non-nil, it take precedence over the settings
+in the Org header.
+
+
+"
+  :type '(repeat (choice string
+                         function))
+  :group 'org-reverse-datetree
+  :safe t)
+
+(make-variable-buffer-local 'org-reverse-datetree-level-formats)
+
 (defvar-local org-reverse-datetree--file-headers nil
   "Alist of headers of the buffer.")
 
@@ -107,31 +130,16 @@ If a new tree is created, non-nil is returned."
       text)))
 
 ;;;###autoload
-(cl-defun org-reverse-datetree-1 (&optional time
-                                            &key
-                                            tree-type
-                                            week-tree
-                                            return)
+(defun org-reverse-datetree-2 (time level-formats return-type)
   "Jump to the specified date in a reverse date tree.
-
-A reverse date tree is a reversed version of the date tree in
-`org-capture', i.e. a date tree where the newest date is the first.
-This is especially useful for a notes archive, because the latest
-entry on a particular topic is displayed at the top in
-a command like `helm-org-rifle'.
-
-`org-reverse-datetree-find-function' is used to find or insert trees.
 
 TIME is the date to be inserted. If omitted, it will be today.
 
-TREE-TYPE is a symbol which specifies the type of a tree to create.
-It is one of the following values: month, week, and month-and-week.
+LEVEL-FORMATS is a list of formats.
+See `org-reverse-datetree-level-formats' for the data type.
 
-WEEK-TREE is deprecated.  Use TREE-TYPE instead.  If it is non-nil,
-create a week tree.
-
-Depending on the value of RETURN, this function returns the following
-values:
+Depending on the value of RETURN-TYPE, this function returns the
+following values:
 
 \"'marker\":
   Returns the marker of the subtree.
@@ -144,47 +152,82 @@ values:
   argument of `org-refile' function.
 
 \"created\"
-  Returns non-nil if and only if a new tree is created."
+  Returns non-nil if and only if a new tree is created.
+"
+  (unless (derived-mode-p 'org-mode)
+    (user-error "Not in org-mode"))
+  (save-restriction
+    (widen)
+    (goto-char (point-min))
+    (cl-loop for (level . format) in (-zip (number-sequence 1 (length level-formats))
+                                           (-butlast level-formats))
+             do (funcall org-reverse-datetree-find-function
+                         level
+                         (format-time-string format time)
+                         :append-newline t))
+    (let ((new (funcall org-reverse-datetree-find-function (length level-formats)
+                        (format-time-string (-last-item level-formats) time))))
+      (cl-case return-type
+        ('marker (point-marker))
+        ('point (point))
+        ('rfloc (list (nth 4 (org-heading-components))
+                      (buffer-file-name (or (org-base-buffer (current-buffer))
+                                            (current-buffer)))
+                      nil
+                      (point)))
+        ('created new)))))
+
+;;;###autoload
+(cl-defun org-reverse-datetree-1 (&optional time
+                                            &key
+                                            week-tree
+                                            return)
+  "Jump to the specified date in a reverse date tree.
+
+This function is deprecated.
+Use `org-reverse-datetree-2' instead.
+
+A reverse date tree is a reversed version of the date tree in
+`org-capture', i.e. a date tree where the newest date is the first.
+This is especially useful for a notes archive, because the latest
+entry on a particular topic is displayed at the top in
+a command like `helm-org-rifle'.
+
+`org-reverse-datetree-find-function' is used to find or insert trees.
+
+TIME is the date to be inserted. If omitted, it will be today.
+
+If WEEK-TREE is non-nil, it creates week trees.  Otherwise, it
+creates month trees.
+
+For RETURN, see the documentation of `org-reverse-datetree-2'."
   (unless (derived-mode-p 'org-mode)
     (user-error "Not in org-mode"))
   (let ((time (or time (current-time)))
-        (level-formats (cl-ecase (or tree-type
-                                     (if week-tree
-                                         'week
-                                       'month))
-                         ((month nil)
-                          (list org-reverse-datetree-year-format
-                                org-reverse-datetree-month-format
-                                org-reverse-datetree-date-format))
-                         (week
-                          (list org-reverse-datetree-year-format
-                                org-reverse-datetree-week-format
-                                org-reverse-datetree-date-format))
-                         (month-and-week
-                          (list org-reverse-datetree-year-format
-                                org-reverse-datetree-month-format
-                                org-reverse-datetree-week-format
-                                org-reverse-datetree-date-format)))))
-    (save-restriction
-      (widen)
-      (goto-char (point-min))
-      (cl-loop for (level . format) in (-zip (number-sequence 1 (length level-formats))
-                                             (-butlast level-formats))
-               do (funcall org-reverse-datetree-find-function
-                           level
-                           (format-time-string format time)
-                           :append-newline t))
-      (let ((new (funcall org-reverse-datetree-find-function (length level-formats)
-                          (format-time-string (-last-item level-formats) time))))
-        (cl-case return
-          ('marker (point-marker))
-          ('point (point))
-          ('rfloc (list (nth 4 (org-heading-components))
-                        (buffer-file-name (or (org-base-buffer (current-buffer))
-                                              (current-buffer)))
-                        nil
-                        (point)))
-          ('created new))))))
+        (level-formats (org-reverse-datetree--level-formats
+                        (if week-tree
+                            'week
+                          'month))))
+    (org-reverse-datetree-2 time level-formats return)))
+
+(make-obsolete 'org-reverse-datetree-1 'org-reverse-datetree-2 "0.3.0")
+
+(defun org-reverse-datetree--level-formats (tree-type)
+  "Build `org-reverse-datetree-level-formats' for TREE-TYPE."
+  (cl-ecase tree-type
+    (month
+     (list org-reverse-datetree-year-format
+           org-reverse-datetree-month-format
+           org-reverse-datetree-date-format))
+    (week
+     (list org-reverse-datetree-year-format
+           org-reverse-datetree-week-format
+           org-reverse-datetree-date-format))
+    (month-and-week
+     (list org-reverse-datetree-year-format
+           org-reverse-datetree-month-format
+           org-reverse-datetree-week-format
+           org-reverse-datetree-date-format))))
 
 (cl-defun org-reverse-datetree--find-or-insert (level text
                                                       &key append-newline)
@@ -321,33 +364,37 @@ When this function is called interactively, it asks for TIME using
                      :return nil))
   (unless (derived-mode-p 'org-mode)
     (user-error "Not in org-mode"))
-  (org-reverse-datetree--get-file-headers)
-  (let* ((type (org-reverse-datetree--lookup-type-header-1))
-         (org-reverse-datetree-year-format
-          (org-reverse-datetree--lookup-string-header
-           "REVERSE_DATETREE_YEAR_FORMAT"
-           "Year format: "
-           org-reverse-datetree-year-format))
-         (org-reverse-datetree-month-format
-          (when (memq type '(month month-and-week))
+  (if org-reverse-datetree-level-formats
+      (org-reverse-datetree-2 time org-reverse-datetree-level-formats
+                              return)
+    (org-reverse-datetree--get-file-headers)
+    (let* ((type (org-reverse-datetree--lookup-type-header-1))
+           (org-reverse-datetree-year-format
             (org-reverse-datetree--lookup-string-header
-             "REVERSE_DATETREE_MONTH_FORMAT"
-             "Month format: "
-             org-reverse-datetree-month-format)))
-         (org-reverse-datetree-week-format
-          (when (memq type '(week month-and-week))
+             "REVERSE_DATETREE_YEAR_FORMAT"
+             "Year format: "
+             org-reverse-datetree-year-format))
+           (org-reverse-datetree-month-format
+            (when (memq type '(month month-and-week))
+              (org-reverse-datetree--lookup-string-header
+               "REVERSE_DATETREE_MONTH_FORMAT"
+               "Month format: "
+               org-reverse-datetree-month-format)))
+           (org-reverse-datetree-week-format
+            (when (memq type '(week month-and-week))
+              (org-reverse-datetree--lookup-string-header
+               "REVERSE_DATETREE_WEEK_FORMAT"
+               "Week format: "
+               org-reverse-datetree-week-format)))
+           (org-reverse-datetree-date-format
             (org-reverse-datetree--lookup-string-header
-             "REVERSE_DATETREE_WEEK_FORMAT"
-             "Week format: "
-             org-reverse-datetree-week-format)))
-         (org-reverse-datetree-date-format
-          (org-reverse-datetree--lookup-string-header
-           "REVERSE_DATETREE_DATE_FORMAT"
-           "Date format: "
-           org-reverse-datetree-date-format)))
-    (org-reverse-datetree-1 time
-                            :tree-type type
-                            :return return)))
+             "REVERSE_DATETREE_DATE_FORMAT"
+             "Date format: "
+             org-reverse-datetree-date-format))
+           (org-reverse-datetree-level-formats
+            (org-reverse-datetree--level-formats type)))
+      (org-reverse-datetree-2 time org-reverse-datetree-level-formats
+                              return))))
 
 (cl-defun org-reverse-datetree-goto-read-date-in-file (&rest args)
   "Find or create a heading as configured in the file headers.
