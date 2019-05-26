@@ -171,8 +171,7 @@ following values:
                                            (-butlast level-formats))
              do (funcall org-reverse-datetree-find-function
                          level
-                         (org-reverse-datetree--apply-format format time)
-                         :append-newline t))
+                         (org-reverse-datetree--apply-format format time)))
     (let ((new (funcall org-reverse-datetree-find-function (length level-formats)
                         (org-reverse-datetree--apply-format (-last-item level-formats) time))))
       (cl-case return-type
@@ -278,17 +277,40 @@ If a new tree is created, non-nil is returned."
                                        (throw 'search t)))
            ((string< here text) (progn
                                   (end-of-line 0)
-                                  (insert "\n" prefix text)
+                                  (org-reverse-datetree--insert-heading
+                                   prefix text)
                                   (setq created t
                                         found t)
                                   (throw 'search t)))))))
     (unless found
       (goto-char (or bound (point-max)))
-      (insert (concat "\n" prefix text
-                      (when append-newline
-                        "\n")))
+      (org-reverse-datetree--insert-heading
+       prefix text)
       (setq created t))
     created))
+
+(defun org-reverse-datetree--insert-heading (prefix text)
+  "Insert a heading at a particular level into the point.
+
+This function inserts a heading smartly depending on empty lines
+around the point.
+
+PREFIX is a prefix of the heading which consists of one or more
+asterisks and a space.
+
+TEXT is a heading text."
+  ;; If the point is not at bol
+  (when (looking-back (rx (not (any "\n"))))
+    ;; If there is a blank line after the point
+    (if (looking-at (rx (>= 2 "\n")))
+        ;; Go to the bol immediately after the point
+        (forward-char 1)
+      ;; Ensure a new line is inserted
+      (insert "\n")))
+  (insert (if (org--blank-before-heading-p)
+              "\n"
+            "")
+          prefix text))
 
 ;;;; Retrieving configuration from the file header
 
