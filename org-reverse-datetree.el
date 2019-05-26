@@ -252,18 +252,19 @@ e.g. beginning with YYYY(-MM(-DD)).
 
 If a new tree is created, non-nil is returned."
   (declare (indent 1))
-  (let ((prefix (concat (make-string (org-get-valid-level level) ?*) " "))
-        (bound (-min (delq nil (list (save-excursion
-                                       (when (re-search-forward
-                                              (rx bol "# Local Variables:")
-                                              nil t)
-                                         (end-of-line 0)
-                                         (point)))
-                                     (unless (= level 1)
-                                       (save-excursion
-                                         (org-end-of-subtree)))))))
-        created
-        found)
+  (let* ((prefix (concat (make-string (org-get-valid-level level) ?*) " "))
+         (bounds (delq nil (list (save-excursion
+                                   (when (re-search-forward
+                                          (rx bol "# Local Variables:")
+                                          nil t)
+                                     (end-of-line 0)
+                                     (point)))
+                                 (unless (= level 1)
+                                   (save-excursion
+                                     (org-end-of-subtree))))))
+         (bound (when bounds (-min bounds)))
+         created
+         found)
     (catch 'search
       (while (and (or (not bound)
                       (> bound (point)))
