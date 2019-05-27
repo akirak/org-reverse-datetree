@@ -89,14 +89,11 @@ This setting affects the behavior of
 `org-reverse-datetree-goto-read-date-in-file'.
 
 Each item in this variable corresponds to each level in date
-trees. Note that this variable is buffer-local, so you can set it
+trees.  Note that this variable is buffer-local, so you can also set it
 either as a file-local variable or as a directory-local variable.
 
 If this variable is non-nil, it take precedence over the settings
-in the Org header.
-
-
-"
+in the Org header."
   :type '(repeat (choice string
                          function))
   :group 'org-reverse-datetree
