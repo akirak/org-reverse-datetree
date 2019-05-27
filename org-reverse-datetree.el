@@ -94,14 +94,12 @@ This setting affects the behavior of
 `org-reverse-datetree-goto-read-date-in-file'.
 
 Each item in this variable corresponds to each level in date
-trees. Note that this variable is buffer-local, so you can set it
-either as a file-local variable or as a directory-local variable.
+trees.  Note that this variable is buffer-local, so you can also
+set it either as a file-local variable or as a directory-local
+variable.
 
 If this variable is non-nil, it take precedence over the settings
-in the Org header.
-
-
-"
+in the Org header."
   :type '(repeat (choice string
                          function))
   :group 'org-reverse-datetree
@@ -146,7 +144,7 @@ The format can be either a function or a string."
 (defun org-reverse-datetree-2 (time level-formats return-type)
   "Jump to the specified date in a reverse date tree.
 
-TIME is the date to be inserted. If omitted, it will be today.
+TIME is the date to be inserted.  If omitted, it will be today.
 
 LEVEL-FORMATS is a list of formats.
 See `org-reverse-datetree-level-formats' for the data type.
@@ -165,8 +163,7 @@ following values:
   argument of `org-refile' function.
 
 \"created\"
-  Returns non-nil if and only if a new tree is created.
-"
+  Returns non-nil if and only if a new tree is created."
   (unless (derived-mode-p 'org-mode)
     (user-error "Not in org-mode"))
   (save-restriction
@@ -176,8 +173,7 @@ following values:
                                            (-butlast level-formats))
              do (funcall org-reverse-datetree-find-function
                          level
-                         (org-reverse-datetree--apply-format format time)
-                         :append-newline t))
+                         (org-reverse-datetree--apply-format format time)))
     (let ((new (funcall org-reverse-datetree-find-function (length level-formats)
                         (org-reverse-datetree--apply-format (-last-item level-formats) time))))
       (cl-case return-type
@@ -242,14 +238,10 @@ For RETURN, see the documentation of `org-reverse-datetree-2'."
            org-reverse-datetree-week-format
            org-reverse-datetree-date-format))))
 
-(cl-defun org-reverse-datetree--find-or-insert (level text
-                                                      &key append-newline)
+(cl-defun org-reverse-datetree--find-or-insert (level text)
   "Find or create a heading with the given text at the given level.
 
 LEVEL is the level of a tree, and TEXT is a heading of the tree.
-
-If APPEND-NEWLINE is non-nil, a newline is appended to the
-inserted text.
 
 This function uses string comparison to compare the dates in two
 trees.  Therefore your date format must be alphabetically ordered,
@@ -283,17 +275,40 @@ If a new tree is created, non-nil is returned."
                                        (throw 'search t)))
            ((string< here text) (progn
                                   (end-of-line 0)
-                                  (insert "\n" prefix text)
+                                  (org-reverse-datetree--insert-heading
+                                   prefix text)
                                   (setq created t
                                         found t)
                                   (throw 'search t)))))))
     (unless found
       (goto-char (or bound (point-max)))
-      (insert (concat "\n" prefix text
-                      (when append-newline
-                        "\n")))
+      (org-reverse-datetree--insert-heading
+       prefix text)
       (setq created t))
     created))
+
+(defun org-reverse-datetree--insert-heading (prefix text)
+  "Insert a heading at a particular level into the point.
+
+This function inserts a heading smartly depending on empty lines
+around the point.
+
+PREFIX is a prefix of the heading which consists of one or more
+asterisks and a space.
+
+TEXT is a heading text."
+  ;; If the point is not at bol
+  (unless (looking-at (rx bol))
+    ;; If there is a blank line after the point
+    (if (looking-at (rx (>= 2 "\n")))
+        ;; Go to the bol immediately after the point
+        (forward-char 1)
+      ;; Ensure a new line is inserted
+      (insert "\n")))
+  (insert (if (org--blank-before-heading-p)
+              "\n"
+            "")
+          prefix text))
 
 ;;;; Retrieving configuration from the file header
 
@@ -638,7 +653,7 @@ as arguments."
   (org-reverse-datetree-last-dow 0 time))
 
 (defun org-reverse-datetree-last-dow (n &optional time)
-  "Get the date on N-th day of week in the same week as TIME."
+  "Get the date on N th day of week in the same week as TIME."
   (let* ((time (or time (current-time)))
          (x (- (org-reverse-datetree--dow time) n)))
     (time-add time (- (* 86400 (if (>= x 0) x (+ x 7)))))))
