@@ -28,9 +28,9 @@ activities on a particular subject using a search tool like
 ** Features
 - Reverse date trees, where latest contents are shown first.
 - You can customize the format of the date tree.
-- Week trees are also supported.
+- Week trees are also supported. You can even create date trees with four levels (year-month-week-date) or any number of levels.
 - Configurations of date trees are stored in file headers, so each file is ensured to have a single date tree with a consistent structure.
-  Configuration is done interactively on first creation.
+- Configuration is done interactively on first creation.
 ** Prerequisites
 - Emacs 26.1
 - dash
@@ -53,11 +53,12 @@ The format configuration is stored in the file header of each Org file, as shown
 These attributes are added by functions in this package on initial creation of the date tree, so you usually don't have to manually edit them.
 
 You can customize the default format by setting
-=org-reversedate-tree-{year,month,date}-format=.
+=org-reverse-datetree-{year,month,week,date}-format=.
 Note that the formats should be basically numeric and zero-prefixed, since
 date-tree headings are ordered lexicographically by their texts.
 You should avoid a month format containing a string like "Feb" or "February".
 
+Another way to configure the structure is to set =org-reverse-datetree-level-formats= variable as a file-local variable. Through the variable, you can define a structure with any number of levels.
 *** Defining a capture template
 You can define an =org-capture= template which inserts an entry into a date tree with [[https://github.com/akirak/org-starter][org-starter]] package as follows:
 
