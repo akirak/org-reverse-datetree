@@ -89,8 +89,9 @@ This setting affects the behavior of
 `org-reverse-datetree-goto-read-date-in-file'.
 
 Each item in this variable corresponds to each level in date
-trees.  Note that this variable is buffer-local, so you can also set it
-either as a file-local variable or as a directory-local variable.
+trees.  Note that this variable is buffer-local, so you can also
+set it either as a file-local variable or as a directory-local
+variable.
 
 If this variable is non-nil, it take precedence over the settings
 in the Org header."
@@ -138,7 +139,7 @@ The format can be either a function or a string."
 (defun org-reverse-datetree-2 (time level-formats return-type)
   "Jump to the specified date in a reverse date tree.
 
-TIME is the date to be inserted. If omitted, it will be today.
+TIME is the date to be inserted.  If omitted, it will be today.
 
 LEVEL-FORMATS is a list of formats.
 See `org-reverse-datetree-level-formats' for the data type.
@@ -157,8 +158,7 @@ following values:
   argument of `org-refile' function.
 
 \"created\"
-  Returns non-nil if and only if a new tree is created.
-"
+  Returns non-nil if and only if a new tree is created."
   (unless (derived-mode-p 'org-mode)
     (user-error "Not in org-mode"))
   (save-restriction
@@ -648,7 +648,7 @@ as arguments."
   (org-reverse-datetree-last-dow 0 time))
 
 (defun org-reverse-datetree-last-dow (n &optional time)
-  "Get the date on N-th day of week in the same week as TIME."
+  "Get the date on N th day of week in the same week as TIME."
   (let* ((time (or time (current-time)))
          (x (- (org-reverse-datetree--dow time) n)))
     (time-add time (- (* 86400 (if (>= x 0) x (+ x 7)))))))
