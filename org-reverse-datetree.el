@@ -293,7 +293,7 @@ asterisks and a space.
 
 TEXT is a heading text."
   ;; If the point is not at bol
-  (when (looking-back (rx (not (any "\n"))))
+  (unless (looking-at (rx bol))
     ;; If there is a blank line after the point
     (if (looking-at (rx (>= 2 "\n")))
         ;; Go to the bol immediately after the point
