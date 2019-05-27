@@ -254,8 +254,7 @@ If a new tree is created, non-nil is returned."
                                    (when (re-search-forward
                                           (rx bol "# Local Variables:")
                                           nil t)
-                                     (end-of-line 0)
-                                     (point)))
+                                     (line-end-position)))
                                  (unless (= level 1)
                                    (save-excursion
                                      (org-end-of-subtree))))))
@@ -570,8 +569,7 @@ as arguments."
               (unless (org-at-heading-p)
                 (org-next-visible-heading 1))
               (setq subtree-end (save-excursion
-                                  (org-end-of-subtree)
-                                  (point)))
+                                  (org-end-of-subtree)))
               (push (org-reverse-datetree--refile-to-file
                      file time :ask-always ask-always :prefer prefer)
                     msgs)
@@ -610,8 +608,7 @@ as arguments."
                        (org-with-wide-buffer
                         (goto-char (- (marker-position marker) d))
                         (setq d (+ d (- (save-excursion
-                                          (org-end-of-subtree)
-                                          (point))
+                                          (org-end-of-subtree))
                                         (point))))
                         (push (org-reverse-datetree--refile-to-file
                                file time :ask-always ask-always :prefer prefer)
