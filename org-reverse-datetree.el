@@ -236,14 +236,10 @@ For RETURN, see the documentation of `org-reverse-datetree-2'."
            org-reverse-datetree-week-format
            org-reverse-datetree-date-format))))
 
-(cl-defun org-reverse-datetree--find-or-insert (level text
-                                                      &key append-newline)
+(cl-defun org-reverse-datetree--find-or-insert (level text)
   "Find or create a heading with the given text at the given level.
 
 LEVEL is the level of a tree, and TEXT is a heading of the tree.
-
-If APPEND-NEWLINE is non-nil, a newline is appended to the
-inserted text.
 
 This function uses string comparison to compare the dates in two
 trees.  Therefore your date format must be alphabetically ordered,
