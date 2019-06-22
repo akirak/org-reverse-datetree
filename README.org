@@ -107,6 +107,46 @@ A recommended way to invoke this command is to add an entry to =org-starter-extr
 #+end_src
 
 Then you can run =org-starter-refile-by-key= and press ~p~ key to refile the selected entries to =cpb.org=.
+*** Defining an agenda command
+With [[https://github.com/alphapapa/org-ql][org-ql]] package, you can define a function for browsing entries in a reverse date tree:
+
+#+begin_src emacs-lisp
+  (org-ql-agenda "~/org/cpb.org"
+    (level 4)
+    :sort priority)
+#+end_src
+
+You can also define a custom org-agenda command:
+
+#+begin_src emacs-lisp
+  (setq org-agenda-custom-commands
+        '(("c" "Browse entries in cpb.org"
+           (lambda (_)
+             (org-ql-agenda "~/org/cpb.org"
+               (level 4)
+               :sort priority))
+           ""
+           ((org-super-agenda-groups
+             '((:todo "DONE")
+               (:todo t)))))))
+#+end_src
+
+=org-super-agenda-groups= is an option for [[https://github.com/alphapapa/org-super-agenda][org-super-agenda]] for grouping the contents. If you don't activate =org-super-agenda-mode=, that option is simply ignoerd.
+
+Alternatively, you can define an equivalent agenda command with [[https://github.com/akirak/org-starter][org-starter]] as follows:
+
+#+begin_src emacs-lisp
+  (org-starter-add-agenda-custom-command
+      "c" "Browse entries in cpb.org"
+    (lambda (_)
+      (org-ql-agenda (org-starter-locate-file "cpb.org" nil t)
+        (level 4)
+        :sort priority))
+    ""
+    '((org-super-agenda-groups
+       '((:todo "DONE")
+         (:todo t)))))
+#+end_src
 ** License
 GPL v3
 # Local Variables:
