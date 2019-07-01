@@ -103,7 +103,7 @@ in the Org header."
   :type '(repeat (choice string
                          function))
   :group 'org-reverse-datetree
-  :safe t)
+  :safe nil)
 
 (make-variable-buffer-local 'org-reverse-datetree-level-formats)
 
