@@ -23,6 +23,7 @@ activities on a particular subject using a search tool like
       -  [[#defining-a-capture-template][Defining a capture template]]
       -  [[#jumping-to-a-particular-date][Jumping to a particular date]]
       -  [[#defining-a-refile-function][Defining a refile function]]
+      -  [[#defining-an-agenda-command][Defining an agenda command]]
     -  [[#license][License]]
 
 ** Features
