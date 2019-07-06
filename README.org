@@ -150,5 +150,5 @@ Alternatively, you can define an equivalent agenda command with [[https://github
 ** License
 GPL v3
 # Local Variables:
-# before-save-hook: org-make-toc
+# org-make-toc-mode: t
 # End:
