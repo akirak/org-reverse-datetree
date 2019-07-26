@@ -168,23 +168,25 @@ following values:
     (user-error "Not in org-mode"))
   (save-restriction
     (widen)
-    (goto-char (point-min))
-    (cl-loop for (level . format) in (-zip (number-sequence 1 (length level-formats))
-                                           (-butlast level-formats))
-             do (funcall org-reverse-datetree-find-function
-                         level
-                         (org-reverse-datetree--apply-format format time)))
-    (let ((new (funcall org-reverse-datetree-find-function (length level-formats)
-                        (org-reverse-datetree--apply-format (-last-item level-formats) time))))
-      (cl-case return-type
-        ('marker (point-marker))
-        ('point (point))
-        ('rfloc (list (nth 4 (org-heading-components))
-                      (buffer-file-name (or (org-base-buffer (current-buffer))
-                                            (current-buffer)))
-                      nil
-                      (point)))
-        ('created new)))))
+    (org-save-outline-visibility nil
+      (outline-show-all)
+      (goto-char (point-min))
+      (cl-loop for (level . format) in (-zip (number-sequence 1 (length level-formats))
+                                             (-butlast level-formats))
+               do (funcall org-reverse-datetree-find-function
+                           level
+                           (org-reverse-datetree--apply-format format time)))
+      (let ((new (funcall org-reverse-datetree-find-function (length level-formats)
+                          (org-reverse-datetree--apply-format (-last-item level-formats) time))))
+        (cl-case return-type
+          ('marker (point-marker))
+          ('point (point))
+          ('rfloc (list (nth 4 (org-heading-components))
+                        (buffer-file-name (or (org-base-buffer (current-buffer))
+                                              (current-buffer)))
+                        nil
+                        (point)))
+          ('created new))))))
 
 ;;;###autoload
 (cl-defun org-reverse-datetree-1 (&optional time
