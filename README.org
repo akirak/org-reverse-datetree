@@ -25,6 +25,8 @@ activities on a particular subject using a search tool like
   -  [[#defining-a-refile-function][Defining a refile function]]
   -  [[#defining-an-agenda-command][Defining an agenda command]]
   -  [[#cleaning-up-empty-dates][Cleaning up empty dates]]
+-  [[#changelog][Changelog]]
+  -  [[#031-2020-02-24-mon][0.3.1 [2020-02-24 Mon]​]]
 -  [[#license][License]]
 
 ** Features
@@ -133,5 +135,9 @@ You can also define a custom org-agenda command:
 =org-super-agenda-groups= is an option for [[https://github.com/alphapapa/org-super-agenda][org-super-agenda]] for grouping the contents. If you don't activate =org-super-agenda-mode=, that option is simply ignoerd.
 *** Cleaning up empty dates
 You can use =org-reverse-datetree-cleanup-empty-dates= command to clean up date entries that contains no children.
+** Changelog
+*** 0.3.1 [2020-02-24 Mon]
+- Fix a bunch of issues with =org-reverse-datetree-cleanup-empty-dates=. Explicitly documented the function in README.
+- Switch to GitHub Actions on running CI.
 ** License
 GPL v3
