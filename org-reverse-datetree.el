@@ -41,16 +41,17 @@
 (require 'cl-lib)
 (require 'dash)
 
-(autoload 'org-element-map "org-element")
-(autoload 'org-element-parse-buffer "org-element")
-(autoload 'org-element-property "org-element")
+;; Silent byte compilers
+(declare-function org-element-map "ext:org-element")
+(declare-function org-element-parse-buffer "ext:org-element")
+(declare-function org-element-property "ext:org-element")
 (defvar org-agenda-buffer-name)
 (defvar org-agenda-bulk-marked-entries)
 (defvar org-agenda-persistent-marks)
-(autoload 'org-agenda-error "org-agenda")
-(autoload 'org-agenda-bulk-unmark-all "org-agenda")
-(autoload 'org-agenda-redo "org-agenda")
-(autoload 'org-remove-subtree-entries-from-agenda "org-agenda")
+(declare-function org-agenda-error "ext:org-agenda")
+(declare-function org-agenda-bulk-unmark-all "ext:org-agenda")
+(declare-function org-agenda-redo "ext:org-agenda")
+(declare-function org-remove-subtree-entries-from-agenda "ext:org-agenda")
 
 (defgroup org-reverse-datetree nil
   "Reverse date trees for Org mode."
@@ -240,6 +241,37 @@ For RETURN, see the documentation of `org-reverse-datetree-2'."
            org-reverse-datetree-week-format
            org-reverse-datetree-date-format))))
 
+(defun org-reverse-datetree--get-level-formats ()
+  "Return a list of outline formats for the current buffer."
+  (or org-reverse-datetree-level-formats
+      (progn
+        (org-reverse-datetree--get-file-headers)
+        (let* ((type (org-reverse-datetree--lookup-type-header-1))
+               (org-reverse-datetree-year-format
+                (org-reverse-datetree--lookup-format-header
+                 "REVERSE_DATETREE_YEAR_FORMAT"
+                 "Year format: "
+                 org-reverse-datetree-year-format))
+               (org-reverse-datetree-month-format
+                (when (memq type '(month month-and-week))
+                  (org-reverse-datetree--lookup-format-header
+                   "REVERSE_DATETREE_MONTH_FORMAT"
+                   "Month format: "
+                   org-reverse-datetree-month-format)))
+               (org-reverse-datetree-week-format
+                (when (memq type '(week month-and-week))
+                  (org-reverse-datetree--lookup-format-header
+                   "REVERSE_DATETREE_WEEK_FORMAT"
+                   "Week format: "
+                   org-reverse-datetree-week-format)))
+               (org-reverse-datetree-date-format
+                (org-reverse-datetree--lookup-format-header
+                 "REVERSE_DATETREE_DATE_FORMAT"
+                 "Date format: "
+                 org-reverse-datetree-date-format))
+               (org-reverse-datetree-level-formats))
+          (org-reverse-datetree--level-formats type)))))
+
 (cl-defun org-reverse-datetree--find-or-insert (level text)
   "Find or create a heading with the given text at the given level.
 
@@ -315,6 +347,7 @@ TEXT is a heading text."
 
 (defun org-reverse-datetree--get-file-headers ()
   "Get the file headers of the current Org buffer."
+  (require 'org-element)
   (let ((buffer-ast (org-with-wide-buffer (org-element-parse-buffer))))
     (setq org-reverse-datetree--file-headers
           (org-element-map buffer-ast 'keyword
@@ -428,37 +461,8 @@ When this function is called interactively, it asks for TIME using
                      :return nil))
   (unless (derived-mode-p 'org-mode)
     (user-error "Not in org-mode"))
-  (if org-reverse-datetree-level-formats
-      (org-reverse-datetree-2 time org-reverse-datetree-level-formats
-                              return)
-    (org-reverse-datetree--get-file-headers)
-    (let* ((type (org-reverse-datetree--lookup-type-header-1))
-           (org-reverse-datetree-year-format
-            (org-reverse-datetree--lookup-format-header
-             "REVERSE_DATETREE_YEAR_FORMAT"
-             "Year format: "
-             org-reverse-datetree-year-format))
-           (org-reverse-datetree-month-format
-            (when (memq type '(month month-and-week))
-              (org-reverse-datetree--lookup-format-header
-               "REVERSE_DATETREE_MONTH_FORMAT"
-               "Month format: "
-               org-reverse-datetree-month-format)))
-           (org-reverse-datetree-week-format
-            (when (memq type '(week month-and-week))
-              (org-reverse-datetree--lookup-format-header
-               "REVERSE_DATETREE_WEEK_FORMAT"
-               "Week format: "
-               org-reverse-datetree-week-format)))
-           (org-reverse-datetree-date-format
-            (org-reverse-datetree--lookup-format-header
-             "REVERSE_DATETREE_DATE_FORMAT"
-             "Date format: "
-             org-reverse-datetree-date-format))
-           (org-reverse-datetree-level-formats
-            (org-reverse-datetree--level-formats type)))
-      (org-reverse-datetree-2 time org-reverse-datetree-level-formats
-                              return))))
+  (org-reverse-datetree-2 time (org-reverse-datetree--get-level-formats)
+                          return))
 
 (cl-defun org-reverse-datetree-goto-read-date-in-file (&rest args)
   "Find or create a heading as configured in the file headers.
@@ -669,27 +673,34 @@ as arguments."
   (interactive)
   (unless (derived-mode-p 'org-mode)
     (user-error "Not in org-mode"))
-  (let ((search-spaces-regexp (rx (+ (any " \t\r\n")))))
-    (when (yes-or-no-p "Start from the beginning?")
-      (goto-char (point-min)))
-    (while (re-search-forward (rx (group bol "*** " (* nonl) (* space) "\n")
-                                  "*** ")
-                              nil t)
-      (goto-char (match-beginning 1))
-      (push-mark (match-end 1))
-      (setq mark-active t)
-      (when (yes-or-no-p "Delete this empty date?")
-        (call-interactively #'delete-region)))
-    (when (yes-or-no-p "Delete empty week/month entries from the beginning as well?")
-      (goto-char (point-min))
-      (while (re-search-forward (rx (group bol "** " (* nonl) (* space) "\n")
-                                    "** ")
-                                nil t)
-        (goto-char (match-beginning 1))
-        (push-mark (match-end 1))
-        (setq mark-active t)
-        (when (yes-or-no-p "Delete this empty entry?")
-          (call-interactively #'delete-region))))))
+  (let ((levels (length (org-reverse-datetree--get-level-formats)))
+        count)
+    (org-save-outline-visibility nil
+      (outline-hide-sublevels (1+ levels))
+      (when (and (not (org-before-first-heading-p))
+                 (yes-or-no-p "Start from the beginning?"))
+        (goto-char (point-min)))
+      (catch 'abort
+        (while (> levels 0)
+          (setq count 0)
+          (while (re-search-forward
+                  (format "^\\(\\*\\{%d\\} .*[ \t]*[\n\r]+\\)\\*\\{1,%d\\} "
+                          levels levels)
+                  nil t)
+            (goto-char (match-beginning 1))
+            (push-mark (match-end 1))
+            (setq mark-active t)
+            (when (yes-or-no-p "Delete this empty entry?")
+              (call-interactively #'delete-region)
+              (cl-incf count)))
+          (when (= count 0)
+            (message "No trees were deleted. Aborting")
+            (throw 'abort t))
+          (if (yes-or-no-p "Clean up the upper level as well?")
+              (progn
+                (cl-decf levels)
+                (goto-char (point-min)))
+            (throw 'abort t)))))))
 
 (provide 'org-reverse-datetree)
 ;;; org-reverse-datetree.el ends here

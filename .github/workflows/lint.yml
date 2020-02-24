@@ -1,0 +1,37 @@
+name: lint
+
+on:
+  push:
+    paths-ignore:
+    - '**/*.md'
+    - '**/*.org'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        emacs-version:
+          - emacs-26-1
+          - emacs-26-2
+          - emacs-26-3
+    steps:
+    - name: install nix
+      uses: cachix/install-nix-action@v5
+    - name: install cachix
+      run: nix-env -iA cachix -f https://cachix.org/api/v1/install
+    - name: enable cachix for emacs-ci
+      run: cachix use emacs-ci
+    - name: check if nix is installed
+      run: nix-env --version
+    - uses: actions/checkout@v1
+    - run: nix-channel --add https://github.com/purcell/nix-emacs-ci/archive/master.tar.gz emacs-ci
+    - run: nix-channel --update
+    - name: Run tests
+      env:
+        PACKAGE: ${{ 'org-reverse-datetree' }}
+      run: |
+        set -e
+        nix-build --arg emacs "(import <emacs-ci>).${{ matrix.emacs-version }}" -A $PACKAGE.byte-compile --no-out-link --quiet ci.nix
+        nix-build --arg emacs "(import <emacs-ci>).${{ matrix.emacs-version }}" -A $PACKAGE.checkdoc --no-out-link --quiet ci.nix
+        nix-shell --arg emacs "(import <emacs-ci>).${{ matrix.emacs-version }}" -A $PACKAGE.package-lint --pure --quiet ci.nix
