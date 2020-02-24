@@ -1,3 +1,4 @@
+# -*- mode: org; mode: org-make-toc -*-
 * org-reverse-datetree
 [[https://melpa.org/#/org-reverse-datetree][https://melpa.org/packages/org-reverse-datetree-badge.svg]]
 [[https://travis-ci.org/akirak/org-reverse-datetree][https://travis-ci.org/akirak/org-reverse-datetree.svg?branch=master]]
@@ -11,20 +12,20 @@ activities on a particular subject using a search tool like
 [[https://github.com/alphapapa/helm-org-rifle][helm-org-rifle]].
 
 [[file:screenshots/org-reverse-datetree-1.png]]
-
 ** Table of contents
 :PROPERTIES:
 :TOC:      siblings
 :END:
-    -  [[#features][Features]]
-    -  [[#prerequisites][Prerequisites]]
-    -  [[#usage][Usage]]
-      -  [[#configuring-date-formats][Configuring date formats]]
-      -  [[#defining-a-capture-template][Defining a capture template]]
-      -  [[#jumping-to-a-particular-date][Jumping to a particular date]]
-      -  [[#defining-a-refile-function][Defining a refile function]]
-      -  [[#defining-an-agenda-command][Defining an agenda command]]
-    -  [[#license][License]]
+-  [[#features][Features]]
+-  [[#prerequisites][Prerequisites]]
+-  [[#usage][Usage]]
+  -  [[#configuring-date-formats][Configuring date formats]]
+  -  [[#defining-a-capture-template][Defining a capture template]]
+  -  [[#jumping-to-a-particular-date][Jumping to a particular date]]
+  -  [[#defining-a-refile-function][Defining a refile function]]
+  -  [[#defining-an-agenda-command][Defining an agenda command]]
+  -  [[#cleaning-up-empty-dates][Cleaning up empty dates]]
+-  [[#license][License]]
 
 ** Features
 - Reverse date trees, where latest contents are shown first.
@@ -134,6 +135,3 @@ You can also define a custom org-agenda command:
 You can use =org-reverse-datetree-cleanup-empty-dates= command to clean up date entries that contains no children.
 ** License
 GPL v3
-# Local Variables:
-# org-make-toc-mode: t
-# End:
