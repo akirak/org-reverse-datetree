@@ -63,7 +63,7 @@ date-tree headings are ordered lexicographically by their texts.
 You should avoid a month format containing a string like "Feb" or "February".
 
 Another way to configure the structure is to set =org-reverse-datetree-level-formats= variable as a file-local variable. Through the variable, you can define a structure with any number of levels.
-For example, the following configuration enables date trees consisting of four levels (year-month-week-date) in all files (thanks =@samspo= for [[https://github.com/akirak/org-reverse-datetree/issues/4][an idea]]):
+For example, the following configuration enables date trees consisting of four levels (year-month-week-date) in all files (thanks [[https://github.com/samspo][@samspo]] for [[https://github.com/akirak/org-reverse-datetree/issues/4][reporting]]):
 
 #+begin_src emacs-lisp
   (setq-default org-reverse-datetree-level-formats
