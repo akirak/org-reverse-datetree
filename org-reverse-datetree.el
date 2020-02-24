@@ -671,10 +671,10 @@ as arguments."
   (interactive)
   (unless (derived-mode-p 'org-mode)
     (user-error "Not in org-mode"))
-  (org-save-outline-visibility nil
-    (org-show-all)
-    (let ((levels (length (org-reverse-datetree--get-level-formats)))
-          count)
+  (let ((levels (length (org-reverse-datetree--get-level-formats)))
+        count)
+    (org-save-outline-visibility nil
+      (outline-hide-sublevels (1+ levels))
       (when (and (not (org-before-first-heading-p))
                  (yes-or-no-p "Start from the beginning?"))
         (goto-char (point-min)))
