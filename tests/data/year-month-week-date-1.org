@@ -1,0 +1,24 @@
+#+REVERSE_DATETREE_USE_WEEK_TREE: month-and-week
+#+REVERSE_DATETREE_DATE_FORMAT: %Y-%m-%d %A
+#+REVERSE_DATETREE_WEEK_FORMAT: %Y W%W
+#+REVERSE_DATETREE_MONTH_FORMAT: %Y-%m %B
+#+REVERSE_DATETREE_YEAR_FORMAT: %Y
+
+* 2020
+** 2020-03 March
+*** 2020 W12
+**** 2020-03-23 Monday
+** 2020-02 February
+*** 2020 W05
+**** 2020-02-05 Wednesday
+**** 2020-02-03 Monday
+** 2020-01 January
+*** 2020 W04
+**** 2020-01-27 Monday
+* 2019
+** 2019-12 December
+*** 2019 W49
+**** 2019-12-09 Monday
+** 2019-08 August
+*** 2019 W33
+**** 2019-08-19 Monday

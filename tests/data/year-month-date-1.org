@@ -1,0 +1,20 @@
+#+title: Org reverse datetree example
+#+REVERSE_DATETREE_DATE_FORMAT: %Y-%m-%d %A
+#+REVERSE_DATETREE_MONTH_FORMAT: %Y-%m %B
+#+REVERSE_DATETREE_YEAR_FORMAT: %Y
+#+REVERSE_DATETREE_USE_WEEK_TREE: nil
+* 2020
+** 2020-02 February
+*** 2020-02-28 Friday
+
+*** 2020-02-03 Monday
+** 2020-01 January
+*** 2020-01-13 Monday
+**** Hello
+*** 2020-01-06 Monday
+**** Hi
+* 2019
+** 2019-11 November
+*** 2019-11-24 Sunday
+
+

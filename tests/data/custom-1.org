@@ -1,0 +1,20 @@
+#+title: Custom format example
+#+REVERSE_DATETREE_DATE_FORMAT: %Y-%m-%d %A
+#+REVERSE_DATETREE_WEEK_FORMAT: %Y W%W
+#+REVERSE_DATETREE_MONTH_FORMAT: (lambda (time) (format-time-string "%Y-%m %B" (org-reverse-datetree-monday time)))
+#+REVERSE_DATETREE_YEAR_FORMAT: %Y
+#+REVERSE_DATETREE_USE_WEEK_TREE: month-and-week
+
+* 2020
+** 2020-02 February
+*** 2020 W08
+**** 2020-02-24 Monday
+*** 2020 W05
+**** 2020-02-03 Monday
+** 2020-01 January
+*** 2020 W02
+**** 2020-01-13 Monday
+* 2019
+** 2019-12 December
+*** 2019 W49
+**** 2019-12-09 Monday

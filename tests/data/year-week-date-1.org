@@ -1,0 +1,28 @@
+#+TITLE: A reverse datetree example
+#+REVERSE_DATETREE_USE_WEEK_TREE: t
+#+REVERSE_DATETREE_DATE_FORMAT: %Y-%m-%d %A
+#+REVERSE_DATETREE_WEEK_FORMAT: %Y W%W
+#+REVERSE_DATETREE_YEAR_FORMAT: %Y
+
+* 2020
+** 2020 W08
+*** 2020-02-29 Saturday
+**** Hello
+*** 2020-02-24 Monday
+
+**** Good morning
+**** Good afternoon
+
+**** Good evening
+** 2020 W07
+*** 2020-02-17 Monday
+** 2020 W05
+*** 2020-02-03 Monday
+**** Goodnight
+* 2019
+** 2019 W23
+*** 2019-06-10 Monday
+* 2018
+** 2018 W01
+*** 2018-01-03 Wednesday
+**** Goodbye
