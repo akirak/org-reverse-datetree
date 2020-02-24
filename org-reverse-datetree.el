@@ -240,6 +240,37 @@ For RETURN, see the documentation of `org-reverse-datetree-2'."
            org-reverse-datetree-week-format
            org-reverse-datetree-date-format))))
 
+(defun org-reverse-datetree--get-level-formats ()
+  "Return a list of outline formats for the current buffer."
+  (or org-reverse-datetree-level-formats
+      (progn
+        (org-reverse-datetree--get-file-headers)
+        (let* ((type (org-reverse-datetree--lookup-type-header-1))
+               (org-reverse-datetree-year-format
+                (org-reverse-datetree--lookup-format-header
+                 "REVERSE_DATETREE_YEAR_FORMAT"
+                 "Year format: "
+                 org-reverse-datetree-year-format))
+               (org-reverse-datetree-month-format
+                (when (memq type '(month month-and-week))
+                  (org-reverse-datetree--lookup-format-header
+                   "REVERSE_DATETREE_MONTH_FORMAT"
+                   "Month format: "
+                   org-reverse-datetree-month-format)))
+               (org-reverse-datetree-week-format
+                (when (memq type '(week month-and-week))
+                  (org-reverse-datetree--lookup-format-header
+                   "REVERSE_DATETREE_WEEK_FORMAT"
+                   "Week format: "
+                   org-reverse-datetree-week-format)))
+               (org-reverse-datetree-date-format
+                (org-reverse-datetree--lookup-format-header
+                 "REVERSE_DATETREE_DATE_FORMAT"
+                 "Date format: "
+                 org-reverse-datetree-date-format))
+               (org-reverse-datetree-level-formats))
+          (org-reverse-datetree--level-formats type)))))
+
 (cl-defun org-reverse-datetree--find-or-insert (level text)
   "Find or create a heading with the given text at the given level.
 
@@ -428,37 +459,8 @@ When this function is called interactively, it asks for TIME using
                      :return nil))
   (unless (derived-mode-p 'org-mode)
     (user-error "Not in org-mode"))
-  (if org-reverse-datetree-level-formats
-      (org-reverse-datetree-2 time org-reverse-datetree-level-formats
-                              return)
-    (org-reverse-datetree--get-file-headers)
-    (let* ((type (org-reverse-datetree--lookup-type-header-1))
-           (org-reverse-datetree-year-format
-            (org-reverse-datetree--lookup-format-header
-             "REVERSE_DATETREE_YEAR_FORMAT"
-             "Year format: "
-             org-reverse-datetree-year-format))
-           (org-reverse-datetree-month-format
-            (when (memq type '(month month-and-week))
-              (org-reverse-datetree--lookup-format-header
-               "REVERSE_DATETREE_MONTH_FORMAT"
-               "Month format: "
-               org-reverse-datetree-month-format)))
-           (org-reverse-datetree-week-format
-            (when (memq type '(week month-and-week))
-              (org-reverse-datetree--lookup-format-header
-               "REVERSE_DATETREE_WEEK_FORMAT"
-               "Week format: "
-               org-reverse-datetree-week-format)))
-           (org-reverse-datetree-date-format
-            (org-reverse-datetree--lookup-format-header
-             "REVERSE_DATETREE_DATE_FORMAT"
-             "Date format: "
-             org-reverse-datetree-date-format))
-           (org-reverse-datetree-level-formats
-            (org-reverse-datetree--level-formats type)))
-      (org-reverse-datetree-2 time org-reverse-datetree-level-formats
-                              return))))
+  (org-reverse-datetree-2 time (org-reverse-datetree--get-level-formats)
+                          return))
 
 (cl-defun org-reverse-datetree-goto-read-date-in-file (&rest args)
   "Find or create a heading as configured in the file headers.
