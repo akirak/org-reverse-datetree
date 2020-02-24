@@ -678,6 +678,8 @@ as arguments."
       (goto-char (match-beginning 1))
       (push-mark (match-end 1))
       (setq mark-active t)
+      (org-show-context)
+      (org-show-subtree)
       (when (yes-or-no-p "Delete this empty date?")
         (call-interactively #'delete-region)))
     (when (yes-or-no-p "Delete empty week/month entries from the beginning as well?")
