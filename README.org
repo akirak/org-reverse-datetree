@@ -130,6 +130,8 @@ You can also define a custom org-agenda command:
 #+end_src
 
 =org-super-agenda-groups= is an option for [[https://github.com/alphapapa/org-super-agenda][org-super-agenda]] for grouping the contents. If you don't activate =org-super-agenda-mode=, that option is simply ignoerd.
+*** Cleaning up empty dates
+You can use =org-reverse-datetree-cleanup-empty-dates= command to clean up date entries that contains no children.
 ** License
 GPL v3
 # Local Variables:
