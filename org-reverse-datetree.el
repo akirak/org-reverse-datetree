@@ -41,16 +41,17 @@
 (require 'cl-lib)
 (require 'dash)
 
-(autoload 'org-element-map "org-element")
-(autoload 'org-element-parse-buffer "org-element")
-(autoload 'org-element-property "org-element")
+;; Silent byte compilers
+(declare-function org-element-map "ext:org-element")
+(declare-function org-element-parse-buffer "ext:org-element")
+(declare-function org-element-property "ext:org-element")
 (defvar org-agenda-buffer-name)
 (defvar org-agenda-bulk-marked-entries)
 (defvar org-agenda-persistent-marks)
-(autoload 'org-agenda-error "org-agenda")
-(autoload 'org-agenda-bulk-unmark-all "org-agenda")
-(autoload 'org-agenda-redo "org-agenda")
-(autoload 'org-remove-subtree-entries-from-agenda "org-agenda")
+(declare-function org-agenda-error "ext:org-agenda")
+(declare-function org-agenda-bulk-unmark-all "ext:org-agenda")
+(declare-function org-agenda-redo "ext:org-agenda")
+(declare-function org-remove-subtree-entries-from-agenda "ext:org-agenda")
 
 (defgroup org-reverse-datetree nil
   "Reverse date trees for Org mode."
@@ -346,6 +347,7 @@ TEXT is a heading text."
 
 (defun org-reverse-datetree--get-file-headers ()
   "Get the file headers of the current Org buffer."
+  (require 'org-element)
   (let ((buffer-ast (org-with-wide-buffer (org-element-parse-buffer))))
     (setq org-reverse-datetree--file-headers
           (org-element-map buffer-ast 'keyword
