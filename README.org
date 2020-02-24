@@ -4,8 +4,8 @@
 [[https://github.com/akirak/org-reverse-datetree/workflows/lint/badge.svg?branch=master][https://github.com/akirak/org-reverse-datetree/workflows/lint/badge.svg?branch=master]]
 
 This package provides functions for creating reverse
-date trees, which are similar to date trees created by built-in
-functions of Org mode (e.g. =org-capture= and =org-archive=) but in a
+date trees, which are similar to date trees as supported by built-in
+functions of Org mode (e.g. =org-capture=) but in a
 reversed order. Since newer contents come first in reverse date trees,
 they are more useful in situations where you want to find latest
 activities on a particular subject using a search tool like
