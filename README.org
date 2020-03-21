@@ -73,6 +73,10 @@ For example, the following configuration enables date trees consisting of four l
                   "%Y-%m-%d %A"           ; date
                   ))
 #+end_src
+**** Non-reverse (i.e. ascending) date tree
+Even though this package is named =org-reverse-datetree=, it is now possible to create a non-reverse date tree, i.e. a normal ascending date tree.
+
+To enable the feature, set =org-reverse-datetree-non-reverse= variable to non-nil. It is a file-local variable. The default continues to be a reverse date tree.
 *** Defining a capture template
 You can define an =org-capture= template which inserts an entry into a date tree with [[https://github.com/akirak/org-starter][org-starter]] package as follows:
 
