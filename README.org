@@ -20,12 +20,14 @@ activities on a particular subject using a search tool like
 -  [[#prerequisites][Prerequisites]]
 -  [[#usage][Usage]]
   -  [[#configuring-date-formats][Configuring date formats]]
+    -  [[#non-reverse-date-tree][Non-reverse date tree]]
   -  [[#defining-a-capture-template][Defining a capture template]]
   -  [[#jumping-to-a-particular-date][Jumping to a particular date]]
   -  [[#defining-a-refile-function][Defining a refile function]]
   -  [[#defining-an-agenda-command][Defining an agenda command]]
   -  [[#cleaning-up-empty-dates][Cleaning up empty dates]]
 -  [[#changelog][Changelog]]
+  -  [[#032-2020-03-21][0.3.2 (2020-03-21)]]
   -  [[#031-2020-02-24][0.3.1 (2020-02-24)]]
 -  [[#license][License]]
 
@@ -73,7 +75,7 @@ For example, the following configuration enables date trees consisting of four l
                   "%Y-%m-%d %A"           ; date
                   ))
 #+end_src
-**** Non-reverse (i.e. ascending) date tree
+**** Non-reverse date tree
 Even though this package is named =org-reverse-datetree=, it is now possible to create a non-reverse date tree, i.e. a normal ascending date tree.
 
 To enable the feature, set =org-reverse-datetree-non-reverse= variable to non-nil. It is a file-local variable. The default continues to be a reverse date tree.
@@ -150,6 +152,8 @@ You can also define a custom org-agenda command:
 *** Cleaning up empty dates
 You can use =org-reverse-datetree-cleanup-empty-dates= command to clean up date entries that contains no children.
 ** Changelog
+*** 0.3.2 (2020-03-21)
+Add support for a non-reverse date tree.
 *** 0.3.1 (2020-02-24)
 - Fix a bunch of issues with =org-reverse-datetree-cleanup-empty-dates=. Explicitly documented the function in README.
 - Switch to GitHub Actions on running CI.
