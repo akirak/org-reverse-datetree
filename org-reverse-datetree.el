@@ -111,8 +111,12 @@ in the Org header."
 (defvar-local org-reverse-datetree--file-headers nil
   "Alist of headers of the buffer.")
 
+(defvar-local org-reverse-datetree-non-reverse nil
+  "If non-nil, creates a non-reverse date tree.")
+
 (cl-defun org-reverse-datetree--find-or-prepend (level text
-                                                       &key append-newline)
+                                                       &key append-newline
+                                                       &allow-other-keys)
   "Find or create a heading at a given LEVEL with TEXT.
 
 If APPEND-NEWLINE is non-nil, a newline is appended to the
@@ -142,7 +146,8 @@ The format can be either a function or a string."
     (function (funcall format time))))
 
 ;;;###autoload
-(defun org-reverse-datetree-2 (time level-formats return-type)
+(cl-defun org-reverse-datetree-2 (time level-formats return-type
+                                       &key asc)
   "Jump to the specified date in a reverse date tree.
 
 TIME is the date to be inserted.  If omitted, it will be today.
@@ -164,7 +169,9 @@ following values:
   argument of `org-refile' function.
 
 \"created\"
-  Returns non-nil if and only if a new tree is created."
+  Returns non-nil if and only if a new tree is created.
+
+If ASC is non-nil, it creates a non-reverse date tree."
   (unless (derived-mode-p 'org-mode)
     (user-error "Not in org-mode"))
   (save-restriction
@@ -176,9 +183,11 @@ following values:
                                              (-butlast level-formats))
                do (funcall org-reverse-datetree-find-function
                            level
-                           (org-reverse-datetree--apply-format format time)))
+                           (org-reverse-datetree--apply-format format time)
+                           :asc asc))
       (let ((new (funcall org-reverse-datetree-find-function (length level-formats)
-                          (org-reverse-datetree--apply-format (-last-item level-formats) time))))
+                          (org-reverse-datetree--apply-format (-last-item level-formats) time)
+                          :asc asc)))
         (cl-case return-type
           ('marker (point-marker))
           ('point (point))
@@ -272,7 +281,9 @@ For RETURN, see the documentation of `org-reverse-datetree-2'."
                (org-reverse-datetree-level-formats))
           (org-reverse-datetree--level-formats type)))))
 
-(cl-defun org-reverse-datetree--find-or-insert (level text)
+(cl-defun org-reverse-datetree--find-or-insert (level text
+                                                      &key asc
+                                                      &allow-other-keys)
   "Find or create a heading with the given text at the given level.
 
 LEVEL is the level of a tree, and TEXT is a heading of the tree.
@@ -281,7 +292,10 @@ This function uses string comparison to compare the dates in two
 trees.  Therefore your date format must be alphabetically ordered,
 e.g. beginning with YYYY(-MM(-DD)).
 
-If a new tree is created, non-nil is returned."
+If a new tree is created, non-nil is returned.
+
+If ASC is non-nil, it creates a date tree in ascending
+order i.e. non-reverse datetree."
   (declare (indent 1))
   (let* ((prefix (concat (make-string (org-get-valid-level level) ?*) " "))
          (bounds (delq nil (list (save-excursion
@@ -306,13 +320,16 @@ If a new tree is created, non-nil is returned."
                                        (end-of-line 1)
                                        (setq found t)
                                        (throw 'search t)))
-           ((string< here text) (progn
-                                  (end-of-line 0)
-                                  (org-reverse-datetree--insert-heading
-                                   prefix text)
-                                  (setq created t
-                                        found t)
-                                  (throw 'search t)))))))
+           ((if asc
+                (string> here text)
+              (string< here text))
+            (progn
+              (end-of-line 0)
+              (org-reverse-datetree--insert-heading
+               prefix text)
+              (setq created t
+                    found t)
+              (throw 'search t)))))))
     (unless found
       (goto-char (or bound (point-max)))
       (org-reverse-datetree--insert-heading
@@ -462,7 +479,8 @@ When this function is called interactively, it asks for TIME using
   (unless (derived-mode-p 'org-mode)
     (user-error "Not in org-mode"))
   (org-reverse-datetree-2 time (org-reverse-datetree--get-level-formats)
-                          return))
+                          return
+                          :asc org-reverse-datetree-non-reverse))
 
 (cl-defun org-reverse-datetree-goto-read-date-in-file (&rest args)
   "Find or create a heading as configured in the file headers.
