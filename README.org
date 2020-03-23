@@ -26,6 +26,7 @@ activities on a particular subject using a search tool like
   -  [[#defining-a-refile-function][Defining a refile function]]
   -  [[#defining-an-agenda-command][Defining an agenda command]]
   -  [[#cleaning-up-empty-dates][Cleaning up empty dates]]
+-  [[#configuration-examples][Configuration examples]]
 -  [[#changelog][Changelog]]
   -  [[#032-2020-03-21][0.3.2 (2020-03-21)]]
   -  [[#031-2020-02-24][0.3.1 (2020-02-24)]]
@@ -151,6 +152,8 @@ You can also define a custom org-agenda command:
 =org-super-agenda-groups= is an option for [[https://github.com/alphapapa/org-super-agenda][org-super-agenda]] for grouping the contents. If you don't activate =org-super-agenda-mode=, that option is simply ignoerd.
 *** Cleaning up empty dates
 You can use =org-reverse-datetree-cleanup-empty-dates= command to clean up date entries that contains no children.
+** Configuration examples
+- [[https://out-of-cheese-error.netlify.com/spacemacs-config#org7963676][An Annotated Spacemacs - For an org-mode workflow ·]]: Using the package in some of his =org-capture= templates for clippling URLs, notes, and tasks.
 ** Changelog
 *** 0.3.2 (2020-03-21)
 Add support for a non-reverse date tree.
