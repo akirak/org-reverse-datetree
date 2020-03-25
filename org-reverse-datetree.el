@@ -723,16 +723,14 @@ A prefix argument FIND-DONE should be treated as in
   (interactive "P")
   (require 'org-archive)
   (if (and (org-region-active-p) org-loop-over-headlines-in-active-region)
-      (error "FIXME: Not implemented for a region")
-    ;; The original implementation.
-    ;; (let ((cl (if (eq org-loop-over-headlines-in-active-region 'start-level)
-    ;;   	    'region-start-level 'region))
-    ;;       org-loop-over-headlines-in-active-region)
-    ;;   (org-map-entries
-    ;;    `(progn (setq org-map-continue-from (progn (org-back-to-heading) (point)))
-    ;;   	 (org-archive-subtree ,find-done))
-    ;;    org-loop-over-headlines-in-active-region
-    ;;    cl (if (org-invisible-p) (org-end-of-subtree nil t))))
+      (let ((cl (if (eq org-loop-over-headlines-in-active-region 'start-level)
+        	    'region-start-level 'region))
+            org-loop-over-headlines-in-active-region)
+        (org-map-entries
+         `(progn (setq org-map-continue-from (progn (org-back-to-heading) (point)))
+        	 (org-reverse-datetree-archive-subtree ,find-done))
+         org-loop-over-headlines-in-active-region
+         cl (if (org-invisible-p) (org-end-of-subtree nil t))))
     (cond
      ((equal find-done '(4))  (error "FIXME: Not implemented for prefix"))
      ((equal find-done '(16)) (error "FIXME: Not implemented for prefix"))
