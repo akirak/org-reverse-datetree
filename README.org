@@ -24,10 +24,12 @@ activities on a particular subject using a search tool like
   -  [[#defining-a-capture-template][Defining a capture template]]
   -  [[#jumping-to-a-particular-date][Jumping to a particular date]]
   -  [[#defining-a-refile-function][Defining a refile function]]
+  -  [[#archiving][Archiving]]
   -  [[#defining-an-agenda-command][Defining an agenda command]]
   -  [[#cleaning-up-empty-dates][Cleaning up empty dates]]
 -  [[#configuration-examples][Configuration examples]]
 -  [[#changelog][Changelog]]
+  -  [[#033-2020-03-25][0.3.3 (2020-03-25)]]
   -  [[#032-2020-03-21][0.3.2 (2020-03-21)]]
   -  [[#031-2020-02-24][0.3.1 (2020-02-24)]]
 -  [[#license][License]]
@@ -128,6 +130,15 @@ A recommended way to invoke this command is to add an entry to =org-starter-extr
 #+end_src
 
 Then you can run =org-starter-refile-by-key= and press ~p~ key to refile the selected entries to =cpb.org=.
+*** Archiving
+:PROPERTIES:
+:CREATED_TIME: [2020-03-25 Wed 19:04]
+:END:
+You can archive a tree to a reverse datetree using =org-reverse-datetree-archive-subtree= command.
+It also works on multiple trees in an active region.
+
+The destination is specified in either =REVERSE_DATETREE_ARCHIVE_FILE= property (inherited) or =REVERSE_DATETREE_ARCHIVE_FILE= file header. It should be a file path.
+For now, the target file cannot contain multiple date trees.
 *** Defining an agenda command
 With [[https://github.com/alphapapa/org-ql][org-ql]] package, you can define a function for browsing entries in a reverse date tree:
 
@@ -155,6 +166,8 @@ You can use =org-reverse-datetree-cleanup-empty-dates= command to clean up date 
 ** Configuration examples
 - [[https://out-of-cheese-error.netlify.com/spacemacs-config#org7963676][An Annotated Spacemacs - For an org-mode workflow ·]]: Using the package in some of his =org-capture= templates for clippling URLs, notes, and tasks.
 ** Changelog
+*** 0.3.3 (2020-03-25)
+Add an initial support for archiving.
 *** 0.3.2 (2020-03-21)
 Add support for a non-reverse date tree.
 *** 0.3.1 (2020-02-24)
