@@ -57,6 +57,10 @@
 (defvar org-archive-mark-done)
 (defvar org-archive-subtree-add-inherited-tags)
 (defvar org-archive-file-header-format)
+(declare-function project-roots "ext:project")
+(declare-function project-current "ext:project")
+(declare-function org-show-all "ext:org")
+(declare-function org-inlinetask-remove-END-maybe "ext:org-inlinetask")
 
 (defgroup org-reverse-datetree nil
   "Reverse date trees for Org mode."
