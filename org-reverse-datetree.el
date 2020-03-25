@@ -814,6 +814,9 @@ A prefix argument FIND-DONE should be treated as in
               (goto-char (point-min))
               (org-show-all '(headings blocks))
               ;; Paste
+              ;; Append to the date tree
+              (org-end-of-subtree)
+              ;; Go to the beginning of the line
               (forward-line 1)
               (org-paste-subtree (org-get-valid-level
                                   (1+ (length (org-reverse-datetree--get-level-formats)))))
