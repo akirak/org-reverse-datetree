@@ -59,7 +59,6 @@
 (defvar org-archive-file-header-format)
 (declare-function project-roots "ext:project")
 (declare-function project-current "ext:project")
-(declare-function org-show-all "ext:org")
 (declare-function org-inlinetask-remove-END-maybe "ext:org-inlinetask")
 
 (defgroup org-reverse-datetree nil
@@ -225,7 +224,7 @@ a command like `helm-org-rifle'.
 
 `org-reverse-datetree-find-function' is used to find or insert trees.
 
-TIME is the date to be inserted. If omitted, it will be today.
+TIME is the date to be inserted.  If omitted, it will be today.
 
 If WEEK-TREE is non-nil, it creates week trees.  Otherwise, it
 creates month trees.
@@ -816,7 +815,9 @@ A prefix argument FIND-DONE should be treated as in
                        org-odd-levels-only
                      tr-org-odd-levels-only)))
               (goto-char (point-min))
-              (org-show-all '(headings blocks))
+              (if (fboundp #'org-show-all)
+                  (org-show-all '(headings blocks))
+                (org-show-entry))
               ;; Paste
               ;; Append to the date tree
               (org-end-of-subtree)
