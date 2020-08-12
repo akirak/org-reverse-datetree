@@ -537,7 +537,10 @@ When this function is called interactively, it asks for TIME using
   "Find or create a heading as configured in the file headers.
 
 This function is like `org-reverse-datetree-goto-date-in-file',
-but it always asks for a date even if it is called non-interactively."
+but it always asks for a date even if it is called non-interactively.
+
+ARGS is the arguments to `org-reverse-datetree-goto-date-in-file'
+after the time."
   (interactive)
   (apply #'org-reverse-datetree-goto-date-in-file
          (org-read-date nil t nil)
