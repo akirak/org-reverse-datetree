@@ -547,19 +547,6 @@ but it always asks for a date even if it is called non-interactively."
   "Convert timestamp string S into internal time."
   (apply #'encode-time (org-parse-time-string s)))
 
-(defun org-reverse-datetree--timestamp-from-string (s)
-  "Convert Org timestamp S, as a string, into a timestamp object.
-Return nil if S is not a valid timestamp string."
-  (when (org-string-nw-p s)
-    (with-temp-buffer
-      (save-excursion (insert s))
-      (org-element-timestamp-parser))))
-
-(defun org-reverse-datetree--parse-timestamp-string (s)
-  "Parse a timestamp string S and return a corresponding Emacs time."
-  (org-reverse-datetree--timestamp-to-time
-   (org-reverse-datetree--timestamp-from-string s)))
-
 (cl-defun org-reverse-datetree--get-entry-time (&key ask-always
                                                      (prefer '("CLOSED")))
   "Get an Emacs time for the current Org entry.
