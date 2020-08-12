@@ -606,7 +606,7 @@ Return a string describing the operation."
   "Refile the current Org entry into a configured date tree in a file.
 
 This function refiles the current entry into a date tree in FILE
-configured in the headers of the file. The same configuration as
+configured in the headers of the file.  The same configuration as
 `org-reverse-datetree-goto-date-in-file' is used.
 
 The location in the date tree is specified by TIME, which is an
