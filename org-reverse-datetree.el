@@ -712,6 +712,8 @@ A prefix argument FIND-DONE should be treated as in
 `org-archive-subtree'."
   (interactive "P")
   (require 'org-archive)
+  (unless (fboundp 'org-show-all)
+    (user-error "This function requires `org-show-all' but it is unavailable"))
   (if (and (org-region-active-p) org-loop-over-headlines-in-active-region)
       (let ((cl (if (eq org-loop-over-headlines-in-active-region 'start-level)
         	    'region-start-level 'region))
@@ -802,9 +804,10 @@ A prefix argument FIND-DONE should be treated as in
                        org-odd-levels-only
                      tr-org-odd-levels-only)))
               (goto-char (point-min))
-              (if (fboundp #'org-show-all)
-                  (org-show-all '(headings blocks))
-                (org-show-entry))
+              ;; TODO: Find an alternative to `org-show-all'.
+              ;; org-show-all is unavailable in the Org shipped with
+              ;; Emacs 26.3.
+              (org-show-all '(headings blocks))
               ;; Paste
               ;; Append to the date tree
               (org-end-of-subtree)
