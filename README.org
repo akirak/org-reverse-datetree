@@ -139,6 +139,9 @@ It also works on multiple trees in an active region.
 
 The destination is specified in either =REVERSE_DATETREE_ARCHIVE_FILE= property (inherited) or =REVERSE_DATETREE_ARCHIVE_FILE= file header. It should be a file path.
 For now, the target file cannot contain multiple date trees.
+
+From inside =org-agenda=, you can use =org-reverse-datetree-agenda-archive=.
+It doesn't work on bulk entries for now.
 *** Defining an agenda command
 With [[https://github.com/alphapapa/org-ql][org-ql]] package, you can define a function for browsing entries in a reverse date tree:
 
@@ -166,6 +169,8 @@ You can use =org-reverse-datetree-cleanup-empty-dates= command to clean up date 
 ** Configuration examples
 - [[https://out-of-cheese-error.netlify.com/spacemacs-config#org7963676][An Annotated Spacemacs - For an org-mode workflow ·]]: Using the package in some of his =org-capture= templates for clippling URLs, notes, and tasks.
 ** Changelog
+*** 0.3.4 (2020-09-23)
+Add a function for archiving from org-agenda, =org-reverse-datetree-agenda-archive=.
 *** 0.3.3 (2020-03-25)
 Add an initial support for archiving.
 *** 0.3.2 (2020-03-21)
