@@ -52,6 +52,7 @@
 (declare-function org-agenda-bulk-unmark-all "ext:org-agenda")
 (declare-function org-agenda-redo "ext:org-agenda")
 (declare-function org-remove-subtree-entries-from-agenda "ext:org-agenda")
+(declare-function org-agenda-archive-with "ext:org-agenda")
 (defvar org-archive-subtree-save-file-p)
 (defvar org-archive-save-context-info)
 (defvar org-archive-mark-done)
@@ -881,6 +882,13 @@ A prefix argument FIND-DONE should be treated as in
     (or (org-entry-get-with-inheritance pname)
         (org-reverse-datetree--lookup-file-name-header
          pname "Select an archive file: " :abbreviate origin-file))))
+
+;;;###autoload
+(defun org-reverse-datetree-agenda-archive ()
+  "Archive the entry or subtree belonging to the current agenda entry."
+  (interactive)
+  (funcall-interactively
+   #'org-agenda-archive-with 'org-reverse-datetree-archive-subtree))
 
 ;;;; Utility functions for defining formats
 (defun org-reverse-datetree-monday (&optional time)
