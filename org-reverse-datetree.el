@@ -708,6 +708,7 @@ as arguments."
 ;;;; Archiving
 
 ;; Based on `org-archive-subtree' in org-archive.el 9.4-dev
+;;;###autoload
 (defun org-reverse-datetree-archive-subtree (&optional find-done)
   "An org-reverse-datetree equivalent to `org-archive-subtree'.
 
