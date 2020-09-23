@@ -3,7 +3,7 @@
 ;; Copyright (C) 2018-2020 Akira Komamura
 
 ;; Author: Akira Komamura <akira.komamura@gmail.com>
-;; Version: 0.3.3
+;; Version: 0.3.4
 ;; Package-Requires: ((emacs "26.1") (dash "2.12") (org "9.3"))
 ;; Keywords: outlines
 ;; URL: https://github.com/akirak/org-reverse-datetree
