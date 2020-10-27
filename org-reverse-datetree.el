@@ -185,7 +185,7 @@ If ASC is non-nil, it creates a non-reverse date tree."
     (user-error "Not in org-mode"))
   (save-restriction
     (widen)
-    (org-save-outline-visibility nil
+    (org-save-outline-visibility t
       (outline-show-all)
       (goto-char (point-min))
       (cl-loop for (level . format) in (-zip (number-sequence 1 (length level-formats))
