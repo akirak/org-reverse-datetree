@@ -23,7 +23,7 @@
 ;; GNU General Public License for more details.
 ;;
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
@@ -646,9 +646,9 @@ as arguments."
                   (setq region-end (- region-end len))
                   (goto-char region-start)))))
            (let ((message-log-max nil))
-             (message (format "Refiled to %s:\n%s"
-                              file
-                              (string-join (nreverse msgs) "\n")))))
+             (message "Refiled to %s:\n%s"
+                      file
+                      (string-join (nreverse msgs) "\n"))))
        (org-reverse-datetree--refile-to-file
         file time :ask-always ask-always :prefer prefer)))
     ('org-agenda-mode
@@ -791,7 +791,7 @@ A prefix argument FIND-DONE should be treated as in
                 ;; Force the mode for future visits.
                 (let ((org-insert-mode-line-in-empty-file t)
                       (org-inhibit-startup t))
-                  (call-interactively 'org-mode)))
+                  (call-interactively #'org-mode)))
             (when (and newfile-p org-archive-file-header-format)
               (goto-char (point-max))
               (insert (format org-archive-file-header-format
