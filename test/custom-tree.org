@@ -1,0 +1,25 @@
+#+title: Test file 1
+* Test
+#+begin_src emacs-lisp
+  (setq-local  org-reverse-datetree-level-formats
+               '("%Y"
+                 (lambda (time) (format-time-string "%Y-%m %B" (org-reverse-datetree-monday time)))
+                 "%Y-%m-%d %A"))
+#+end_src
+* 2021
+** 2021-01 January
+*** 2021-01-04 Monday
+* 2020
+** 2020-12 December
+*** 2020-12-10 Thursday
+**** Bye
+My life has ended.
+** 2020-11 November
+*** 2020-11-30 Monday
+*** 2020-11-28 Saturday
+**** Hello
+*** 2020-11-24 Tuesday
+*** 2020-11-18 Wednesday
+* 2019
+** 2019-12 December
+*** 2019-12-12 Thursday
