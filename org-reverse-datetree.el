@@ -928,7 +928,7 @@ are deleted without confirmation as well."
     (user-error "Not in org-mode"))
   (let ((levels (length (org-reverse-datetree--get-level-formats)))
         count)
-    (org-save-outline-visibility nil
+    (org-save-outline-visibility t
       (outline-hide-sublevels (1+ levels))
       (when (and (not noninteractive)
                  (not (org-before-first-heading-p))
