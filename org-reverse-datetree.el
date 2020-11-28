@@ -913,8 +913,16 @@ A prefix argument FIND-DONE should be treated as in
 ;;;; Maintenance commands
 
 ;;;###autoload
-(defun org-reverse-datetree-cleanup-empty-dates ()
-  "Delete empty date entries in the buffer."
+(cl-defun org-reverse-datetree-cleanup-empty-dates (&key noconfirm
+                                                         ancestors)
+  "Delete empty date entries in the buffer.
+
+If NOCONFIRM is non-nil, leaf nodes are deleted without
+confirmation. In non-interactive mode, you have to explicitly set
+this argument.
+
+If both NOCONFIRM and ANCESTORS are non-nil, upper level nodes
+are deleted without confirmation as well."
   (interactive)
   (unless (derived-mode-p 'org-mode)
     (user-error "Not in org-mode"))
@@ -922,7 +930,8 @@ A prefix argument FIND-DONE should be treated as in
         count)
     (org-save-outline-visibility nil
       (outline-hide-sublevels (1+ levels))
-      (when (and (not (org-before-first-heading-p))
+      (when (and (not noninteractive)
+                 (not (org-before-first-heading-p))
                  (yes-or-no-p "Start from the beginning?"))
         (goto-char (point-min)))
       (catch 'abort
@@ -935,13 +944,16 @@ A prefix argument FIND-DONE should be treated as in
             (goto-char (match-beginning 1))
             (push-mark (match-end 1))
             (setq mark-active t)
-            (when (yes-or-no-p "Delete this empty entry?")
+            (when (or noninteractive
+                      noconfirm
+                      (yes-or-no-p "Delete this empty entry?"))
               (call-interactively #'delete-region)
               (cl-incf count)))
           (when (= count 0)
             (message "No trees were deleted. Aborting")
             (throw 'abort t))
-          (if (yes-or-no-p "Clean up the upper level as well?")
+          (if (or (and ancestors (or noninteractive noconfirm))
+                  (yes-or-no-p "Clean up the upper level as well?"))
               (progn
                 (cl-decf levels)
                 (goto-char (point-min)))
