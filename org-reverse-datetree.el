@@ -965,8 +965,9 @@ are deleted without confirmation as well."
           (when (= count 0)
             (message "No trees were deleted. Aborting")
             (throw 'abort t))
-          (if (or (and ancestors (or noninteractive noconfirm))
-                  (yes-or-no-p "Clean up the upper level as well?"))
+          (if (and (> levels 1)
+                   (or (and ancestors (or noninteractive noconfirm))
+                       (yes-or-no-p "Clean up the upper level as well?")))
               (progn
                 (cl-decf levels)
                 (goto-char (point-min)))
