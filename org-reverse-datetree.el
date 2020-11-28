@@ -947,14 +947,19 @@ are deleted without confirmation as well."
                                           (and (** 1 ,levels "*")
                                                " "))))
                   nil t)
-            (goto-char (match-beginning 1))
-            (push-mark (match-end 1))
-            (setq mark-active t)
-            (when (or noninteractive
-                      noconfirm
-                      (yes-or-no-p "Delete this empty entry?"))
-              (call-interactively #'delete-region)
-              (cl-incf count)))
+            (let ((begin (match-beginning 1))
+                  (end (match-end 1)))
+              (cond
+               (noconfirm
+                (delete-region begin end)
+                (cl-incf count))
+               ((not noninteractive)
+                (goto-char begin)
+                (push-mark end)
+                (setq mark-active t)
+                (when (yes-or-no-p "Delete this empty entry?")
+                  (call-interactively #'delete-region)
+                  (cl-incf count))))))
           (when (= count 0)
             (message "No trees were deleted. Aborting")
             (throw 'abort t))
