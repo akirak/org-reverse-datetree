@@ -58,6 +58,7 @@
 (defvar org-archive-mark-done)
 (defvar org-archive-subtree-add-inherited-tags)
 (defvar org-archive-file-header-format)
+(defvar org-refile-active-region-within-subtree)
 (declare-function project-roots "ext:project")
 (declare-function project-current "ext:project")
 (declare-function org-inlinetask-remove-END-maybe "ext:org-inlinetask")
