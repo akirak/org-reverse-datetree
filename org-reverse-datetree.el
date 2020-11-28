@@ -23,7 +23,7 @@
 ;; GNU General Public License for more details.
 ;;
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
@@ -58,6 +58,7 @@
 (defvar org-archive-mark-done)
 (defvar org-archive-subtree-add-inherited-tags)
 (defvar org-archive-file-header-format)
+(defvar org-refile-active-region-within-subtree)
 (declare-function project-roots "ext:project")
 (declare-function project-current "ext:project")
 (declare-function org-inlinetask-remove-END-maybe "ext:org-inlinetask")
@@ -645,9 +646,9 @@ as arguments."
                   (setq region-end (- region-end len))
                   (goto-char region-start)))))
            (let ((message-log-max nil))
-             (message (format "Refiled to %s:\n%s"
-                              file
-                              (string-join (nreverse msgs) "\n")))))
+             (message "Refiled to %s:\n%s"
+                      file
+                      (string-join (nreverse msgs) "\n"))))
        (org-reverse-datetree--refile-to-file
         file time :ask-always ask-always :prefer prefer)))
     ('org-agenda-mode
@@ -790,7 +791,7 @@ A prefix argument FIND-DONE should be treated as in
                 ;; Force the mode for future visits.
                 (let ((org-insert-mode-line-in-empty-file t)
                       (org-inhibit-startup t))
-                  (call-interactively 'org-mode)))
+                  (call-interactively #'org-mode)))
             (when (and newfile-p org-archive-file-header-format)
               (goto-char (point-max))
               (insert (format org-archive-file-header-format
@@ -912,35 +913,61 @@ A prefix argument FIND-DONE should be treated as in
 ;;;; Maintenance commands
 
 ;;;###autoload
-(defun org-reverse-datetree-cleanup-empty-dates ()
-  "Delete empty date entries in the buffer."
+(cl-defun org-reverse-datetree-cleanup-empty-dates (&key noconfirm
+                                                         ancestors)
+  "Delete empty date entries in the buffer.
+
+If NOCONFIRM is non-nil, leaf nodes are deleted without
+confirmation. In non-interactive mode, you have to explicitly set
+this argument.
+
+If both NOCONFIRM and ANCESTORS are non-nil, upper level nodes
+are deleted without confirmation as well."
   (interactive)
   (unless (derived-mode-p 'org-mode)
     (user-error "Not in org-mode"))
   (let ((levels (length (org-reverse-datetree--get-level-formats)))
         count)
-    (org-save-outline-visibility nil
+    (org-save-outline-visibility t
       (outline-hide-sublevels (1+ levels))
-      (when (and (not (org-before-first-heading-p))
+      (when (and (not noninteractive)
+                 (not (org-before-first-heading-p))
                  (yes-or-no-p "Start from the beginning?"))
         (goto-char (point-min)))
       (catch 'abort
         (while (> levels 0)
           (setq count 0)
           (while (re-search-forward
-                  (format "^\\(\\*\\{%d\\} .*[ \t]*[\n\r]+\\)\\*\\{1,%d\\} "
-                          levels levels)
+                  (rx-to-string `(and bol
+                                      (group (= ,levels "*")
+                                             (+ " ")
+                                             (*? nonl)
+                                             (+ "\n"))
+                                      (or string-end
+                                          (and (** 1 ,levels "*")
+                                               " "))))
                   nil t)
-            (goto-char (match-beginning 1))
-            (push-mark (match-end 1))
-            (setq mark-active t)
-            (when (yes-or-no-p "Delete this empty entry?")
-              (call-interactively #'delete-region)
-              (cl-incf count)))
+            (let ((begin (match-beginning 1))
+                  (end (match-end 1)))
+              (cond
+               (noconfirm
+                (delete-region begin end)
+                (cl-incf count)
+                (goto-char begin))
+               ((not noninteractive)
+                (goto-char begin)
+                (push-mark end)
+                (setq mark-active t)
+                (when (yes-or-no-p "Delete this empty entry?")
+                  (call-interactively #'delete-region)
+                  (cl-incf count)
+                  (goto-char begin))))))
           (when (= count 0)
             (message "No trees were deleted. Aborting")
             (throw 'abort t))
-          (if (yes-or-no-p "Clean up the upper level as well?")
+          (if (and (> levels 1)
+                   (or (and ancestors (or noninteractive noconfirm))
+                       (yes-or-no-p "Clean up the upper level as well?")))
               (progn
                 (cl-decf levels)
                 (goto-char (point-min)))
