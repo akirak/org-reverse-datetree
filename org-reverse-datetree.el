@@ -952,14 +952,16 @@ are deleted without confirmation as well."
               (cond
                (noconfirm
                 (delete-region begin end)
-                (cl-incf count))
+                (cl-incf count)
+                (goto-char begin))
                ((not noninteractive)
                 (goto-char begin)
                 (push-mark end)
                 (setq mark-active t)
                 (when (yes-or-no-p "Delete this empty entry?")
                   (call-interactively #'delete-region)
-                  (cl-incf count))))))
+                  (cl-incf count)
+                  (goto-char begin))))))
           (when (= count 0)
             (message "No trees were deleted. Aborting")
             (throw 'abort t))
