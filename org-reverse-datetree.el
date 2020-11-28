@@ -938,8 +938,14 @@ are deleted without confirmation as well."
         (while (> levels 0)
           (setq count 0)
           (while (re-search-forward
-                  (format "^\\(\\*\\{%d\\} .*[ \t]*[\n\r]+\\)\\*\\{1,%d\\} "
-                          levels levels)
+                  (rx-to-string `(and bol
+                                      (group (= ,levels "*")
+                                             (+ " ")
+                                             (*? nonl)
+                                             (+ "\n"))
+                                      (or string-end
+                                          (and (** 1 ,levels "*")
+                                               " "))))
                   nil t)
             (goto-char (match-beginning 1))
             (push-mark (match-end 1))
