@@ -535,6 +535,7 @@ When this function is called interactively, it asks for TIME using
                           return
                           :asc org-reverse-datetree-non-reverse))
 
+;;;###autoload
 (cl-defun org-reverse-datetree-goto-read-date-in-file (&rest args)
   "Find or create a heading as configured in the file headers.
 
