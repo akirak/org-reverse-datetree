@@ -118,6 +118,18 @@ in the Org header."
 
 (make-variable-buffer-local 'org-reverse-datetree-level-formats)
 
+(defcustom org-reverse-datetree-show-context t
+  "Whether to show the context of the destination date.
+
+When this option is non-nil, the date visited is shown using
+`org-show-context' if it is invisible.
+
+This is generally recommended in interactive use, but it slows
+down performance to some extent. When you refile many entries to
+a single file, you may want to turn off this option."
+  :group 'org-reverse-datetree
+  :type 'boolean)
+
 (defvar-local org-reverse-datetree--file-headers nil
   "Alist of headers of the buffer.")
 
@@ -156,7 +168,8 @@ The format can be either a function or a string."
     (function (funcall format time))))
 
 ;;;###autoload
-(cl-defun org-reverse-datetree-2 (time level-formats return-type
+(cl-defun org-reverse-datetree-2 (time level-formats
+                                       &optional return-type
                                        &key asc)
   "Jump to the specified date in a reverse date tree.
 
@@ -186,27 +199,31 @@ If ASC is non-nil, it creates a non-reverse date tree."
     (user-error "Not in org-mode"))
   (save-restriction
     (widen)
-    (org-save-outline-visibility t
-      (outline-show-all)
-      (goto-char (point-min))
-      (cl-loop for (level . format) in (-zip (number-sequence 1 (length level-formats))
-                                             (-butlast level-formats))
-               do (funcall org-reverse-datetree-find-function
-                           level
-                           (org-reverse-datetree--apply-format format time)
-                           :asc asc))
-      (let ((new (funcall org-reverse-datetree-find-function (length level-formats)
-                          (org-reverse-datetree--apply-format (-last-item level-formats) time)
-                          :asc asc)))
-        (cl-case return-type
-          ('marker (point-marker))
-          ('point (point))
-          ('rfloc (list (nth 4 (org-heading-components))
-                        (buffer-file-name (or (org-base-buffer (current-buffer))
-                                              (current-buffer)))
-                        nil
-                        (point)))
-          ('created new))))))
+    (prog1
+        (org-save-outline-visibility t
+          (outline-show-all)
+          (goto-char (point-min))
+          (cl-loop for (level . format) in (-zip (number-sequence 1 (length level-formats))
+                                                 (-butlast level-formats))
+                   do (funcall org-reverse-datetree-find-function
+                               level
+                               (org-reverse-datetree--apply-format format time)
+                               :asc asc))
+          (let ((new (funcall org-reverse-datetree-find-function (length level-formats)
+                              (org-reverse-datetree--apply-format (-last-item level-formats) time)
+                              :asc asc)))
+            (cl-case return-type
+              ('marker (point-marker))
+              ('point (point))
+              ('rfloc (list (nth 4 (org-heading-components))
+                            (buffer-file-name (or (org-base-buffer (current-buffer))
+                                                  (current-buffer)))
+                            nil
+                            (point)))
+              ('created new))))
+      (when org-reverse-datetree-show-context
+        (unless (org-invisible-p)
+          (org-show-context 'org-goto))))))
 
 ;;;###autoload
 (cl-defun org-reverse-datetree-1 (&optional time
