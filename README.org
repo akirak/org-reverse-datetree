@@ -132,6 +132,31 @@ A recommended way to invoke this command is to add an entry to =org-starter-extr
 #+end_src
 
 Then you can run =org-starter-refile-by-key= and press ~p~ key to refile the selected entries to =cpb.org=.
+
+The following snippet is a naive implementation of a function which migrates entries in a date-tree file (the current buffer) to another date-tree file (=dest-file= argument):
+
+#+begin_src emacs-lisp
+  (defun org-reverse-datetree-migrate-to-file (dest-file)
+    (let ((depth (length (org-reverse-datetree--get-level-formats)))
+          (org-reverse-datetree-show-context nil))
+      (save-restriction
+        (widen)
+        (while (re-search-forward (rx-to-string `(and bol
+                                                      ,(make-string depth ?\*)
+                                                      space))
+                                  nil t)
+          (let ((date (thread-last (seq-drop (parse-time-string
+                                              (org-get-heading t t t t))
+                                             3)
+                        (append '(0 0 0))
+                        (encode-time))))
+            (if date
+                (progn
+                  (outline-next-heading)
+                  (while (= (1+ depth) (org-outline-level))
+                    (org-reverse-datetree-refile-to-file dest-file date)))
+              (user-error "Date is unavailable")))))))
+#+end_src
 *** Archiving
 :PROPERTIES:
 :CREATED_TIME: [2020-03-25 Wed 19:04]
