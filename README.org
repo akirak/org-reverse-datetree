@@ -1,5 +1,8 @@
 # -*- mode: org; mode: org-make-toc -*-
 * org-reverse-datetree
+:PROPERTIES:
+:TOC:      :include descendants :depth 2
+:END:
 [[https://melpa.org/#/org-reverse-datetree][https://melpa.org/packages/org-reverse-datetree-badge.svg]]
 [[https://github.com/akirak/org-reverse-datetree/workflows/CI/badge.svg][https://github.com/akirak/org-reverse-datetree/workflows/CI/badge.svg]]
 
@@ -12,30 +15,22 @@ activities on a particular subject using a search tool like
 [[https://github.com/alphapapa/helm-org-rifle][helm-org-rifle]].
 
 [[file:screenshots/org-reverse-datetree-1.png]]
-** Table of contents
-:PROPERTIES:
-:TOC:      siblings
-:END:
--  [[#features][Features]]
--  [[#prerequisites][Prerequisites]]
--  [[#usage][Usage]]
-  -  [[#configuring-date-formats][Configuring date formats]]
-    -  [[#non-reverse-date-tree][Non-reverse date tree]]
-  -  [[#defining-a-capture-template][Defining a capture template]]
-  -  [[#jumping-to-a-particular-date][Jumping to a particular date]]
-  -  [[#defining-a-refile-function][Defining a refile function]]
-  -  [[#archiving][Archiving]]
-  -  [[#defining-an-agenda-command][Defining an agenda command]]
-  -  [[#cleaning-up-empty-dates][Cleaning up empty dates]]
--  [[#configuration-examples][Configuration examples]]
--  [[#changelog][Changelog]]
-  -  [[#035-2020-11-28][0.3.5 (2020-11-28)]]
-  -  [[#034-2020-09-23][0.3.4 (2020-09-23)]]
-  -  [[#033-2020-03-25][0.3.3 (2020-03-25)]]
-  -  [[#032-2020-03-21][0.3.2 (2020-03-21)]]
-  -  [[#031-2020-02-24][0.3.1 (2020-02-24)]]
--  [[#license][License]]
 
+:CONTENTS:
+- [[#features][Features]]
+- [[#prerequisites][Prerequisites]]
+- [[#usage][Usage]]
+  - [[#configuring-date-formats][Configuring date formats]]
+  - [[#defining-a-capture-template][Defining a capture template]]
+  - [[#jumping-to-a-particular-date][Jumping to a particular date]]
+  - [[#defining-a-refile-function][Defining a refile function]]
+  - [[#archiving][Archiving]]
+  - [[#defining-an-agenda-command][Defining an agenda command]]
+  - [[#cleaning-up-empty-dates][Cleaning up empty dates]]
+- [[#configuration-examples][Configuration examples]]
+- [[#changelog][Changelog]]
+- [[#license][License]]
+:END:
 ** Features
 - Reverse date trees, where latest contents are shown first.
 - You can customize the format of the date tree.
@@ -196,6 +191,9 @@ You can use =org-reverse-datetree-cleanup-empty-dates= command to clean up date 
 ** Configuration examples
 - [[https://out-of-cheese-error.netlify.com/spacemacs-config#org7963676][An Annotated Spacemacs - For an org-mode workflow ·]]: Using the package in some of his =org-capture= templates for clippling URLs, notes, and tasks.
 ** Changelog
+:PROPERTIES:
+:TOC:      :depth 0
+:END:
 *** 0.3.6 (2021-01-18)
 - Add =org-reverse-datetree-show-context= option.
 *** 0.3.5 (2020-11-28)
