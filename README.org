@@ -196,6 +196,8 @@ You can use =org-reverse-datetree-cleanup-empty-dates= command to clean up date 
 ** Configuration examples
 - [[https://out-of-cheese-error.netlify.com/spacemacs-config#org7963676][An Annotated Spacemacs - For an org-mode workflow ·]]: Using the package in some of his =org-capture= templates for clippling URLs, notes, and tasks.
 ** Changelog
+*** 0.3.6 (2021-01-18)
+- Add =org-reverse-datetree-show-context= option.
 *** 0.3.5 (2020-11-28)
 - Fix bugs with =org-reverse-datetree-cleanup-empty-dates=.
 - Switch to [[https://github.com/akirak/elinter/][elinter]] for CI.
