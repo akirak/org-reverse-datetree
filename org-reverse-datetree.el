@@ -234,8 +234,7 @@ tree of the date tree, like a file+olp+datetree target of
                               (point)))
                 ('created new)))))
       (when org-reverse-datetree-show-context
-        (unless (org-invisible-p)
-          (org-show-context 'org-goto))))))
+        (org-show-set-visibility 'canonical)))))
 
 ;;;###autoload
 (cl-defun org-reverse-datetree-1 (&optional time
