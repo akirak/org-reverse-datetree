@@ -546,13 +546,16 @@ If ABBREVIATE is non-nil, abbreviate the file name."
 
 ;;;###autoload
 (cl-defun org-reverse-datetree-goto-date-in-file (&optional time
-                                                            &key return)
+                                                            &key return olp)
   "Find or create a heading as configured in the file headers.
 
 This function finds an entry at TIME in a date tree as configured
 by file headers of the buffer.  If there is no such configuration,
 ask the user for a new configuration.  If TIME is omitted, it is
-the current date.  RETURN is the same as in `org-reverse-datetree-1'.
+the current date.
+
+RETURN and OLP are the same as in `org-reverse-datetree-2', which
+see.
 
 When this function is called interactively, it asks for TIME using
 `org-read-date' and go to an entry of the date."
@@ -562,7 +565,8 @@ When this function is called interactively, it asks for TIME using
     (user-error "Not in org-mode"))
   (org-reverse-datetree-2 time (org-reverse-datetree--get-level-formats)
                           return
-                          :asc org-reverse-datetree-non-reverse))
+                          :asc org-reverse-datetree-non-reverse
+                          :olp olp))
 
 ;;;###autoload
 (cl-defun org-reverse-datetree-goto-read-date-in-file (&rest args)
@@ -571,8 +575,9 @@ When this function is called interactively, it asks for TIME using
 This function is like `org-reverse-datetree-goto-date-in-file',
 but it always asks for a date even if it is called non-interactively.
 
-ARGS is the arguments to `org-reverse-datetree-goto-date-in-file'
-after the time."
+ARGS are the arguments to
+`org-reverse-datetree-goto-date-in-file' without the time, which
+see."
   (interactive)
   (apply #'org-reverse-datetree-goto-date-in-file
          (org-read-date nil t nil)
