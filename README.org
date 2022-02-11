@@ -91,6 +91,37 @@ You can define an =org-capture= template which inserts an entry into a date tree
   :clock-in t :clock-resume t :empty-lines 1)
 #+end_src
 
+Or with [[https://github.com/progfolio/doct][doct]]:
+
+#+begin_src emacs-lisp
+  (setq org-capture-templates
+        (doct '(("Commonplace book" :keys "c"
+                 :file "~/org/cpb.org"
+                 :function org-reverse-datetree-goto-date-in-file
+                 :template ("* %?")))))
+#+end_src
+**** :olp option
+If you want a date tree under an outline path (like =file+olp+datetree= target in =org-capture=), call the function with =:olp= option:
+
+#+begin_src emacs-lisp
+  (org-reverse-datetree-goto-date-in-file nil :olp '("Group" "Subgroup 1"))
+#+end_src
+
+which you could use in a capture template like this:
+
+#+begin_src emacs-lisp
+  (setq org-capture-templates
+        '(("c" "Commonplace book" entry
+           (file+function "cpb.org"
+                          (lambda ()
+                            (org-reverse-datetree-goto-date-in-file
+                             nil :olp '("Group" "Subgroup 1"))))
+           "* %?"
+           :clock-in t :clock-resume t)))
+#+end_src
+
+When a new olp is created, it is ordered alphabetically (or lexicographically).
+
 *** Jumping to a particular date
 Use =org-reverse-datetree-goto-date-in-file= command to jump to a particular date in the date tree of the current file.
 
