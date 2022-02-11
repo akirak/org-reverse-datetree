@@ -1,20 +1,15 @@
-name: 'CI'
+name: 'Lint and build'
 on:
   pull_request:
-  push:
-    branches:
-    - master
     paths-ignore:
-    - '**.md'
     - '**.org'
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
-    - uses: cachix/install-nix-action@v12
-      with:
-        nix_path: nixpkgs=channel:nixos-unstable
     - uses: actions/checkout@v2
-    - uses: akirak/elinter@v4
-    - run: elinter -t --buttercup -e latest
+    - uses: akirak/makem-action@master
+      with:
+        min-emacs-version: 26.1
+        lint-package: lint-basic
+    # TODO: Run buttercup
