@@ -1,4 +1,4 @@
 # compiled files
 *.elc
 
-.elinter-cache
+result

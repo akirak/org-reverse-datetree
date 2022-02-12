@@ -1,0 +1,225 @@
+{
+  "nodes": {
+    "elinter": {
+      "inputs": {
+        "elsa": "elsa",
+        "emacs-ci": "emacs-ci",
+        "flake-utils": "flake-utils",
+        "gitignore": "gitignore",
+        "gnu-elpa": [
+          "gnu-elpa"
+        ],
+        "melpa": [
+          "melpa"
+        ],
+        "nixpkgs": "nixpkgs",
+        "package-lint": "package-lint",
+        "twist": "twist"
+      },
+      "locked": {
+        "lastModified": 1644780005,
+        "narHash": "sha256-Vsm2O05UF3bugibeIg7v9eWKqznv/zFKGI+tWOtaWTM=",
+        "owner": "akirak",
+        "repo": "elinter",
+        "rev": "5692e052ef4bf0d107d3f1875cb3416451c6c048",
+        "type": "github"
+      },
+      "original": {
+        "owner": "akirak",
+        "ref": "v5",
+        "repo": "elinter",
+        "type": "github"
+      }
+    },
+    "elisp-helpers": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1644084222,
+        "narHash": "sha256-Z7K0UkMvjZ+rwzhE2smK5GCl4LkrmY97MKkpay23yDo=",
+        "owner": "emacs-twist",
+        "repo": "elisp-helpers",
+        "rev": "7e295072ec385d0ef7e46efca259d9276542cd6f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "emacs-twist",
+        "repo": "elisp-helpers",
+        "type": "github"
+      }
+    },
+    "elsa": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1644279463,
+        "narHash": "sha256-uYx5LBvxv3F7OKWdBGiXrrWHSRt6/54hnE/tuxUTyqs=",
+        "owner": "emacs-elsa",
+        "repo": "Elsa",
+        "rev": "82ffb6eecefde7e99383e4a657f17fe414287846",
+        "type": "github"
+      },
+      "original": {
+        "owner": "emacs-elsa",
+        "repo": "Elsa",
+        "type": "github"
+      }
+    },
+    "emacs-ci": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1637854310,
+        "narHash": "sha256-oYwxv+rb5fkxraAle2OMTO6dfIh7yvT3XwXK8IFYUvM=",
+        "owner": "purcell",
+        "repo": "nix-emacs-ci",
+        "rev": "6ac997af7076d654521870c3a3caabdcc5c37399",
+        "type": "github"
+      },
+      "original": {
+        "owner": "purcell",
+        "repo": "nix-emacs-ci",
+        "type": "github"
+      }
+    },
+    "flake-utils": {
+      "locked": {
+        "lastModified": 1644229661,
+        "narHash": "sha256-1YdnJAsNy69bpcjuoKdOYQX0YxZBiCYZo4Twxerqv7k=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "3cecb5b042f7f209c56ffd8371b2711a290ec797",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "fromElisp": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1620725665,
+        "narHash": "sha256-xLQDuSXjlTJUPftbT/PTegrn6yySoEYrFlUP5e8Kfuc=",
+        "owner": "talyz",
+        "repo": "fromElisp",
+        "rev": "1c0d9b629b505a6d7ba050172b2fcaf43fa32801",
+        "type": "github"
+      },
+      "original": {
+        "owner": "talyz",
+        "repo": "fromElisp",
+        "type": "github"
+      }
+    },
+    "gitignore": {
+      "inputs": {
+        "nixpkgs": [
+          "elinter",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1635165013,
+        "narHash": "sha256-o/BdVjNwcB6jOmzZjOH703BesSkkS5O7ej3xhyO8hAY=",
+        "owner": "hercules-ci",
+        "repo": "gitignore.nix",
+        "rev": "5b9e0ff9d3b551234b4f3eb3983744fa354b17f1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hercules-ci",
+        "repo": "gitignore.nix",
+        "type": "github"
+      }
+    },
+    "gnu-elpa": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1644606971,
+        "narHash": "sha256-fAV8fKuHk39Qo+kA/87LJH6YgxaQQK9OQ5LmlHvcjkA=",
+        "ref": "main",
+        "rev": "ae9243c12203c37a0acbbb4919a5d3ff96555314",
+        "revCount": 336,
+        "type": "git",
+        "url": "https://git.savannah.gnu.org/git/emacs/elpa.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://git.savannah.gnu.org/git/emacs/elpa.git"
+      }
+    },
+    "melpa": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1644593597,
+        "narHash": "sha256-yopT1e4TNACzJNG/kDXsKODzlWBWI58G/L1rGmxfPmM=",
+        "owner": "melpa",
+        "repo": "melpa",
+        "rev": "f45f7a57134656ab1f7f2030fb65294eb11e6ba2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "melpa",
+        "repo": "melpa",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1643087856,
+        "narHash": "sha256-EreC7gP/T566PDRZjqNoTvByTyvABEpJpWFtyNUDS0Y=",
+        "path": "/nix/store/q5ipbyw3kxa7q9fia4c564rbdnhy4xsa-source",
+        "rev": "8bd55a6a5ab05942af769c2aa2494044bff7f625",
+        "type": "path"
+      },
+      "original": {
+        "id": "nixpkgs",
+        "type": "indirect"
+      }
+    },
+    "package-lint": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1644654625,
+        "narHash": "sha256-YprQ7XwzqHsBVEroNC4OXBzkjwX/y1T37Pw2M8kNVRQ=",
+        "owner": "purcell",
+        "repo": "package-lint",
+        "rev": "fc30a795000a1ae98bb3d09e5b2929bedfc402fe",
+        "type": "github"
+      },
+      "original": {
+        "owner": "purcell",
+        "repo": "package-lint",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "elinter": "elinter",
+        "gnu-elpa": "gnu-elpa",
+        "melpa": "melpa"
+      }
+    },
+    "twist": {
+      "inputs": {
+        "elisp-helpers": "elisp-helpers",
+        "fromElisp": "fromElisp"
+      },
+      "locked": {
+        "lastModified": 1644088583,
+        "narHash": "sha256-OPsrvBbsmd7F4LeXWWSBx4W19a15gughH1MTNHT2xS4=",
+        "owner": "emacs-twist",
+        "repo": "twist.nix",
+        "rev": "385f0a3d75646d4aca7b60eb2cf5951fb145b630",
+        "type": "github"
+      },
+      "original": {
+        "owner": "emacs-twist",
+        "repo": "twist.nix",
+        "type": "github"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
