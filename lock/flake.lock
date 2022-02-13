@@ -1,0 +1,61 @@
+{
+  "nodes": {
+    "buttercup": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1640908139,
+        "narHash": "sha256-ZX0h/WZiQYHx/dNdkvCnE6J3A77bA/ygwweA6FmnyB0=",
+        "owner": "jorgenschaefer",
+        "repo": "emacs-buttercup",
+        "rev": "1cb7afcb0b6d87a3e623dc26ffcb2c7d4d6dd280",
+        "type": "github"
+      },
+      "original": {
+        "owner": "jorgenschaefer",
+        "repo": "emacs-buttercup",
+        "type": "github"
+      }
+    },
+    "dash": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1632096711,
+        "narHash": "sha256-oeIUEe5OGgij6IessN6bmS7re5r+D5BlrU4MOsaK3JE=",
+        "owner": "magnars",
+        "repo": "dash.el",
+        "rev": "da167c51e9fd167a48d06c7c0ee8e3ac7abd9718",
+        "type": "github"
+      },
+      "original": {
+        "owner": "magnars",
+        "repo": "dash.el",
+        "type": "github"
+      }
+    },
+    "org-reverse-datetree": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1642669669,
+        "narHash": "sha256-gaIvhN1BeJgaBRVMESrs6RzJESZX8viBRb3ZRZyMRTI=",
+        "owner": "akirak",
+        "repo": "org-reverse-datetree",
+        "rev": "341e829a730dd9eb1c14e2588fecb3ad7361f989",
+        "type": "github"
+      },
+      "original": {
+        "owner": "akirak",
+        "repo": "org-reverse-datetree",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "buttercup": "buttercup",
+        "dash": "dash",
+        "org-reverse-datetree": "org-reverse-datetree"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

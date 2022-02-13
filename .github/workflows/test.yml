@@ -1,0 +1,19 @@
+name: 'Lint and test'
+on:
+  push:
+    paths:
+      - '**.el'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: cachix/install-nix-action@v16
+      with:
+        extra_nix_config: |
+          substituters = https://cache.nixos.org https://emacs-ci.cachix.org
+          trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= emacs-ci.cachix.org-1:B5FVOrxhXXrOL0S+tQ7USrhjMT5iOPH+QN9q0NItom4=
+    - uses: actions/checkout@v2
+    - name: Lint and compile
+      run: nix run .#elinter -- org-reverse-datetree
+    - name: Test
+      run: nix run .#test
