@@ -1,8 +1,8 @@
 name: 'Lint and test'
 on:
   push:
-    # paths:
-    #   - '**.el'
+    paths:
+      - '**.el'
 jobs:
   test:
     runs-on: ubuntu-latest
