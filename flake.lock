@@ -17,12 +17,13 @@
         "twist": "twist"
       },
       "locked": {
-        "lastModified": 1644801155,
-        "narHash": "sha256-uJgXDpyVk5ES+rhEu3HvH0kvMDm2Ygh08zpDC5mBxKw=",
-        "owner": "akirak",
-        "repo": "elinter",
-        "rev": "79947bec2adf20e8e85e03aff7089c4cce55d1e4",
-        "type": "github"
+        "lastModified": 1644844948,
+        "narHash": "sha256-r4oEAC60F0GtrWRbMS1nHZMaZ8FpXDP0VdAMG3oQa6g=",
+        "ref": "v5",
+        "rev": "079b8c61bfcacebef8ba0eed6872a4293639681b",
+        "revCount": 381,
+        "type": "git",
+        "url": "file:///home/akirakomamura/work/github.com/elinter/elinter-v5"
       },
       "original": {
         "owner": "akirak",

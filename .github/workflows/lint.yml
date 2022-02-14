@@ -1,11 +1,11 @@
-name: 'test'
+name: 'lint'
 on: push: { paths: ['**.el'] }
 jobs:
-  test:
+  lint:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        emacs_version: ["26.1","26.2","26.3","27.1","27.2","snapshot"]
+        emacs_version: ["snapshot"]
     steps:
     - uses: purcell/setup-emacs@master
       with:
@@ -15,7 +15,7 @@ jobs:
       run: |
         cat <(jq -r '.nodes.root.inputs | map(.) | .[]' lock/flake.lock) \
             <(jq -r 'keys | .[]' lock/archive.lock) \
-             \
+            <(echo 'package-lint') \
             | xargs emacs -batch -l package --eval \
             "(progn
                 (push '(\"melpa\" . \"https://melpa.org/packages/\")
@@ -31,11 +31,13 @@ jobs:
                        (package-install (cadr (assq package 
                                                     package-archive-contents)))))))"
     - name: Byte-compile
-      if: ${{ true }}
+      if: ${{ false }}
       run: |
         emacs -batch -l bytecomp -l package --eval "(package-initialize)" -L . \
           --eval "(setq byte-compile-error-on-warn t)" \
           -f batch-byte-compile 'org-reverse-datetree.el'
     - run: |
-        emacs -l package --eval "(package-initialize)" -L . -batch -l buttercup -f buttercup-run-discover "$PWD"
-      name: Run buttercup tests
+        emacs -l package --eval "(package-initialize)" -L . -batch -l package-lint \
+          --eval "(setq package-lint-main-file \"org-reverse-datetree.el\")" \
+          -f package-lint-batch-and-exit 'org-reverse-datetree.el'
+      name: Run package-lint

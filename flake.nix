@@ -36,6 +36,7 @@
       ];
       scripts = {
         test = {
+          description = "Run buttercup tests";
           compile = true;
           text = ''
             emacs -batch -l buttercup -f buttercup-run-discover "$PWD"
