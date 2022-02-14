@@ -17,11 +17,11 @@
         "twist": "twist"
       },
       "locked": {
-        "lastModified": 1644801155,
-        "narHash": "sha256-uJgXDpyVk5ES+rhEu3HvH0kvMDm2Ygh08zpDC5mBxKw=",
+        "lastModified": 1644841460,
+        "narHash": "sha256-LdTg+p5bolf8rU+DkeqAtXw17VB/+/nNuWTccJEqFFo=",
         "owner": "akirak",
         "repo": "elinter",
-        "rev": "79947bec2adf20e8e85e03aff7089c4cce55d1e4",
+        "rev": "eda7617e017d9ced1f2ea54ccbc8ed77688dfcf3",
         "type": "github"
       },
       "original": {
