@@ -14,6 +14,12 @@
       repo = "dash.el";
       type = "github";
     };
+    org = {
+      flake = false;
+      ref = "bugfix";
+      type = "git";
+      url = "git://git.sv.gnu.org/emacs/org-mode.git";
+    };
     org-reverse-datetree = {
       flake = false;
       owner = "akirak";

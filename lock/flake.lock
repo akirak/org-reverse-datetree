@@ -32,6 +32,23 @@
         "type": "github"
       }
     },
+    "org": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1644786821,
+        "narHash": "sha256-rYk4wiCOeCkM1b4dxYc7/TbvqfN2PvSpmb9UUlbHpFQ=",
+        "ref": "bugfix",
+        "rev": "17e4fe90930596ba5cdf82223b9f5de9040a9581",
+        "revCount": 24610,
+        "type": "git",
+        "url": "git://git.sv.gnu.org/emacs/org-mode.git"
+      },
+      "original": {
+        "ref": "bugfix",
+        "type": "git",
+        "url": "git://git.sv.gnu.org/emacs/org-mode.git"
+      }
+    },
     "org-reverse-datetree": {
       "flake": false,
       "locked": {
@@ -52,6 +69,7 @@
       "inputs": {
         "buttercup": "buttercup",
         "dash": "dash",
+        "org": "org",
         "org-reverse-datetree": "org-reverse-datetree"
       }
     }

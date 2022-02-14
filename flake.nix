@@ -31,11 +31,16 @@
       ];
       extraPackages = [
         "buttercup"
+        # Emacs 26.2 or before requires installation of a newer version of Org
+        "org"
       ];
       scripts = {
-        test = ''
-          emacs -batch -l buttercup -f buttercup-run-discover "$PWD"
-        '';
+        test = {
+          compile = true;
+          text = ''
+            emacs -batch -l buttercup -f buttercup-run-discover "$PWD"
+          '';
+        };
       };
     };
 }
