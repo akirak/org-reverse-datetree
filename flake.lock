@@ -12,18 +12,17 @@
         "melpa": [
           "melpa"
         ],
-        "nixpkgs": "nixpkgs_2",
+        "nixpkgs": "nixpkgs",
         "package-lint": "package-lint",
         "twist": "twist"
       },
       "locked": {
-        "lastModified": 1644844948,
-        "narHash": "sha256-r4oEAC60F0GtrWRbMS1nHZMaZ8FpXDP0VdAMG3oQa6g=",
-        "ref": "v5",
-        "rev": "079b8c61bfcacebef8ba0eed6872a4293639681b",
-        "revCount": 381,
-        "type": "git",
-        "url": "file:///home/akirakomamura/work/github.com/elinter/elinter-v5"
+        "lastModified": 1644845715,
+        "narHash": "sha256-dc4y9JK74/cjn9nxOYg6LW6MdV38KG4afUBJkhOvGsw=",
+        "owner": "akirak",
+        "repo": "elinter",
+        "rev": "f8c0d043c1f7479f14ce373cb1d7187024f042fe",
+        "type": "github"
       },
       "original": {
         "owner": "akirak",
@@ -113,7 +112,10 @@
     },
     "gitignore": {
       "inputs": {
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": [
+          "elinter",
+          "nixpkgs"
+        ]
       },
       "locked": {
         "lastModified": 1635165013,
@@ -163,19 +165,6 @@
       }
     },
     "nixpkgs": {
-      "locked": {
-        "lastModified": 1643087856,
-        "narHash": "sha256-EreC7gP/T566PDRZjqNoTvByTyvABEpJpWFtyNUDS0Y=",
-        "path": "/nix/store/q5ipbyw3kxa7q9fia4c564rbdnhy4xsa-source",
-        "rev": "8bd55a6a5ab05942af769c2aa2494044bff7f625",
-        "type": "path"
-      },
-      "original": {
-        "id": "nixpkgs",
-        "type": "indirect"
-      }
-    },
-    "nixpkgs_2": {
       "locked": {
         "lastModified": 1643087856,
         "narHash": "sha256-EreC7gP/T566PDRZjqNoTvByTyvABEpJpWFtyNUDS0Y=",
