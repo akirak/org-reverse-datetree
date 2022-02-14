@@ -225,6 +225,8 @@ You can use =org-reverse-datetree-cleanup-empty-dates= command to clean up date 
 :PROPERTIES:
 :TOC:      :depth 0
 :END:
+*** 0.3.7 (2022-02-14)
+- Add =:olp= argument to functions. (Based on a feedback from [[https://github.com/krvpal][@krvpal]] at [[https://github.com/akirak/org-reverse-datetree/issues/23][#23]].)
 *** 0.3.6 (2022-01-18)
 - Add =org-reverse-datetree-show-context= option.
 *** 0.3.5 (2020-11-28)
