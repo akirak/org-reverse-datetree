@@ -17,6 +17,7 @@ jobs:
       run: |
         cat <(jq -r '.nodes.root.inputs | map(.) | .[]' lock/flake.lock) \
             <(jq -r 'keys | .[]' lock/archive.lock) \
+             \
             | xargs emacs -batch -l package --eval \
             "(progn
                 (push '(\"melpa\" . \"https://melpa.org/packages/\")
@@ -32,11 +33,11 @@ jobs:
                        (package-install (cadr (assq package 
                                                     package-archive-contents)))))))"
     - name: Byte-compile
+      if: ${{ true }}
       run: |
         emacs -batch -l bytecomp -l package --eval "(package-initialize)" -L . \
           --eval "(setq byte-compile-error-on-warn t)" \
           -f batch-byte-compile 'org-reverse-datetree.el'
     - run: |
         emacs -l package --eval "(package-initialize)" -L . -batch -l buttercup -f buttercup-run-discover "$PWD"
-
       name: Run buttercup tests
