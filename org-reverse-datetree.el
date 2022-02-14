@@ -170,7 +170,7 @@ The format can be either a function or a string."
 ;;;###autoload
 (cl-defun org-reverse-datetree-2 (time level-formats
                                        &optional return-type
-                                       &key asc)
+                                       &key asc olp)
   "Jump to the specified date in a reverse date tree.
 
 TIME is the date to be inserted.  If omitted, it will be today.
@@ -194,7 +194,11 @@ following values:
 \"created\"
   Returns non-nil if and only if a new tree is created.
 
-If ASC is non-nil, it creates a non-reverse date tree."
+If ASC is non-nil, it creates a non-reverse date tree.
+
+If OLP is a string or a list of strings, it specifies the parent
+tree of the date tree, like a file+olp+datetree target of
+`org-capture'."
   (unless (derived-mode-p 'org-mode)
     (user-error "Not in org-mode"))
   (save-restriction
@@ -202,25 +206,33 @@ If ASC is non-nil, it creates a non-reverse date tree."
     (prog1
         (org-save-outline-visibility t
           (outline-show-all)
-          (goto-char (point-min))
-          (cl-loop for (level . format) in (-zip (number-sequence 1 (length level-formats))
-                                                 (-butlast level-formats))
-                   do (funcall org-reverse-datetree-find-function
-                               level
-                               (org-reverse-datetree--apply-format format time)
-                               :asc asc))
-          (let ((new (funcall org-reverse-datetree-find-function (length level-formats)
-                              (org-reverse-datetree--apply-format (-last-item level-formats) time)
-                              :asc asc)))
-            (cl-case return-type
-              ('marker (point-marker))
-              ('point (point))
-              ('rfloc (list (nth 4 (org-heading-components))
-                            (buffer-file-name (or (org-base-buffer (current-buffer))
-                                                  (current-buffer)))
-                            nil
-                            (point)))
-              ('created new))))
+          (if olp
+              (org-reverse-datetree--olp (cl-etypecase olp
+                                           (string (list olp))
+                                           (list olp)))
+            (goto-char (point-min)))
+          (let ((parent-level (length olp)))
+            (cl-loop for (level . format) in (-zip (number-sequence
+                                                    (+ parent-level 1)
+                                                    (+ parent-level (length level-formats)))
+                                                   (-butlast level-formats))
+                     do (funcall org-reverse-datetree-find-function
+                                 level
+                                 (org-reverse-datetree--apply-format format time)
+                                 :asc asc))
+            (let ((new (funcall org-reverse-datetree-find-function (+ parent-level
+                                                                      (length level-formats))
+                                (org-reverse-datetree--apply-format (-last-item level-formats) time)
+                                :asc asc)))
+              (cl-case return-type
+                ('marker (point-marker))
+                ('point (point))
+                ('rfloc (list (nth 4 (org-heading-components))
+                              (buffer-file-name (or (org-base-buffer (current-buffer))
+                                                    (current-buffer)))
+                              nil
+                              (point)))
+                ('created new)))))
       (when org-reverse-datetree-show-context
         (unless (org-invisible-p)
           (org-show-context 'org-goto))))))
@@ -534,13 +546,16 @@ If ABBREVIATE is non-nil, abbreviate the file name."
 
 ;;;###autoload
 (cl-defun org-reverse-datetree-goto-date-in-file (&optional time
-                                                            &key return)
+                                                            &key return olp)
   "Find or create a heading as configured in the file headers.
 
 This function finds an entry at TIME in a date tree as configured
 by file headers of the buffer.  If there is no such configuration,
 ask the user for a new configuration.  If TIME is omitted, it is
-the current date.  RETURN is the same as in `org-reverse-datetree-1'.
+the current date.
+
+RETURN and OLP are the same as in `org-reverse-datetree-2', which
+see.
 
 When this function is called interactively, it asks for TIME using
 `org-read-date' and go to an entry of the date."
@@ -550,7 +565,8 @@ When this function is called interactively, it asks for TIME using
     (user-error "Not in org-mode"))
   (org-reverse-datetree-2 time (org-reverse-datetree--get-level-formats)
                           return
-                          :asc org-reverse-datetree-non-reverse))
+                          :asc org-reverse-datetree-non-reverse
+                          :olp olp))
 
 ;;;###autoload
 (cl-defun org-reverse-datetree-goto-read-date-in-file (&rest args)
@@ -559,8 +575,9 @@ When this function is called interactively, it asks for TIME using
 This function is like `org-reverse-datetree-goto-date-in-file',
 but it always asks for a date even if it is called non-interactively.
 
-ARGS is the arguments to `org-reverse-datetree-goto-date-in-file'
-after the time."
+ARGS are the arguments to
+`org-reverse-datetree-goto-date-in-file' without the time, which
+see."
   (interactive)
   (apply #'org-reverse-datetree-goto-date-in-file
          (org-read-date nil t nil)
@@ -569,6 +586,26 @@ after the time."
 (defun org-reverse-datetree--timestamp-to-time (s)
   "Convert timestamp string S into internal time."
   (apply #'encode-time (org-parse-time-string s)))
+
+(defun org-reverse-datetree--olp (olp)
+  "Go to an outline path in the current buffer or create it.
+
+OLP must be a list of strings."
+  (let ((existing (copy-sequence olp))
+        marker)
+    (while (and existing
+                (not (setq marker (ignore-errors (org-find-olp existing t)))))
+      (setq existing (nbutlast existing 1)))
+    (if marker
+        (goto-char marker)
+      (goto-char (point-min)))
+    (pcase-dolist
+        (`(,level . ,text)
+         (-drop (length existing)
+                (-zip (number-sequence 1 (length olp))
+                      olp)))
+      (funcall org-reverse-datetree-find-function
+               level text :asc t))))
 
 (cl-defun org-reverse-datetree--get-entry-time (&key ask-always
                                                      (prefer '("CLOSED")))
