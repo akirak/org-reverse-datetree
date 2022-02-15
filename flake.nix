@@ -11,8 +11,8 @@
       flake = false;
     };
 
-    elinter = {
-      url = "github:akirak/elinter/v5";
+    nomake = {
+      url = "github:emacs-twist/nomake";
       inputs.gnu-elpa.follows = "gnu-elpa";
       inputs.melpa.follows = "melpa";
     };
@@ -20,12 +20,11 @@
 
   outputs =
     { self
-    , elinter
+    , nomake
     , ...
     } @ inputs:
-    elinter.lib.mkFlake {
+    nomake.lib.mkFlake {
       src = ./.;
-      lockDirName = "lock";
       localPackages = [
         "org-reverse-datetree"
       ];

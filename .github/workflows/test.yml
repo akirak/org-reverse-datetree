@@ -13,8 +13,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install dependencies
       run: |
-        cat <(jq -r '.nodes.root.inputs | map(.) | .[]' lock/flake.lock) \
-            <(jq -r 'keys | .[]' lock/archive.lock) \
+        cat <(jq -r '.nodes.root.inputs | map(.) | .[]' .nomake/flake.lock) \
+            <(jq -r 'keys | .[]' .nomake/archive.lock) \
              \
             | xargs emacs -batch -l package --eval \
             "(progn

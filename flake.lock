@@ -1,36 +1,5 @@
 {
   "nodes": {
-    "elinter": {
-      "inputs": {
-        "elsa": "elsa",
-        "emacs-ci": "emacs-ci",
-        "flake-utils": "flake-utils",
-        "gitignore": "gitignore",
-        "gnu-elpa": [
-          "gnu-elpa"
-        ],
-        "melpa": [
-          "melpa"
-        ],
-        "nixpkgs": "nixpkgs",
-        "package-lint": "package-lint",
-        "twist": "twist"
-      },
-      "locked": {
-        "lastModified": 1644845715,
-        "narHash": "sha256-dc4y9JK74/cjn9nxOYg6LW6MdV38KG4afUBJkhOvGsw=",
-        "owner": "akirak",
-        "repo": "elinter",
-        "rev": "f8c0d043c1f7479f14ce373cb1d7187024f042fe",
-        "type": "github"
-      },
-      "original": {
-        "owner": "akirak",
-        "ref": "v5",
-        "repo": "elinter",
-        "type": "github"
-      }
-    },
     "elisp-helpers": {
       "flake": false,
       "locked": {
@@ -113,7 +82,7 @@
     "gitignore": {
       "inputs": {
         "nixpkgs": [
-          "elinter",
+          "nomake",
           "nixpkgs"
         ]
       },
@@ -177,6 +146,36 @@
         "type": "indirect"
       }
     },
+    "nomake": {
+      "inputs": {
+        "elsa": "elsa",
+        "emacs-ci": "emacs-ci",
+        "flake-utils": "flake-utils",
+        "gitignore": "gitignore",
+        "gnu-elpa": [
+          "gnu-elpa"
+        ],
+        "melpa": [
+          "melpa"
+        ],
+        "nixpkgs": "nixpkgs",
+        "package-lint": "package-lint",
+        "twist": "twist"
+      },
+      "locked": {
+        "lastModified": 1644927080,
+        "narHash": "sha256-UW8eXOMLWQGc0o4Qm6m6npRjL8OvKKBVOBKuc2rn+qk=",
+        "owner": "emacs-twist",
+        "repo": "nomake",
+        "rev": "16e35d1828f585720fafab99afe5ead4988bc529",
+        "type": "github"
+      },
+      "original": {
+        "owner": "emacs-twist",
+        "repo": "nomake",
+        "type": "github"
+      }
+    },
     "package-lint": {
       "flake": false,
       "locked": {
@@ -195,9 +194,9 @@
     },
     "root": {
       "inputs": {
-        "elinter": "elinter",
         "gnu-elpa": "gnu-elpa",
-        "melpa": "melpa"
+        "melpa": "melpa",
+        "nomake": "nomake"
       }
     },
     "twist": {
