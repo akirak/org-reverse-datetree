@@ -38,7 +38,8 @@ activities on a particular subject using a search tool like
 - Configurations of date trees are stored in file headers, so each file is ensured to have a single date tree with a consistent structure.
 - Configuration is done interactively on first creation.
 ** Prerequisites
-- Emacs 26.1
+- Emacs 26.1 or later
+- Org 9.3 or later
 - dash
 ** Usage
 The following functions retrieve a configuration from the file header:
