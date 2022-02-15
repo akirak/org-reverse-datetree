@@ -101,6 +101,8 @@ Or with [[https://github.com/progfolio/doct][doct]]:
                  :template ("* %?")))))
 #+end_src
 **** :olp option
+Warning: This is an experimental feature, so advanced features such as refiling, archiving, and cleaning up (which are described later) are not supported for it.
+
 If you want a date tree under an outline path (like =file+olp+datetree= target in =org-capture=), call the function with =:olp= option:
 
 #+begin_src emacs-lisp
