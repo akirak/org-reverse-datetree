@@ -167,7 +167,8 @@ The following snippet is a naive implementation of a function which migrates ent
 #+begin_src emacs-lisp
   (defun org-reverse-datetree-migrate-to-file (dest-file)
     (let ((depth (length (org-reverse-datetree--get-level-formats)))
-          (org-reverse-datetree-show-context nil))
+          ;; Prevent from showing the contexts for better performance
+          (org-reverse-datetree-show-context-detail nil))
       (save-restriction
         (widen)
         (while (re-search-forward (rx-to-string `(and bol
@@ -228,6 +229,8 @@ You can use =org-reverse-datetree-cleanup-empty-dates= command to clean up date 
 :PROPERTIES:
 :TOC:      :depth 0
 :END:
+*** 0.3.8 (2022-02-22)
+- Add =org-reverse-datetree-show-context-detail= to allow customization of the behavior.
 *** 0.3.7 (2022-02-14)
 - Add =:olp= argument to functions. (Based on a feedback from [[https://github.com/krvpal][@krvpal]] at [[https://github.com/akirak/org-reverse-datetree/issues/23][#23]].)
 *** 0.3.6 (2022-01-18)
