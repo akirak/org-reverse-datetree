@@ -130,6 +130,36 @@ a single file, you may want to turn off this option."
   :group 'org-reverse-datetree
   :type 'boolean)
 
+(defcustom org-reverse-datetree-show-context-detail
+  '((default . ancestors))
+  "Alist that defines how to show the context of the date entry.
+
+This is a list of (RETURN-TYPE . DETAIL) items where RETURN-TYPE
+is an argument of `org-reverse-datetree-2' and DETAIL is a
+visibility span as used in `org-show-context-detail'. When there
+is no entry matching the return type of no return type is given,
+`default' will be used.
+
+Depending on the return type, the context is shown after jumping
+to a date tree.
+
+If this variable is nil, no explicit operation to show the
+context is performed, which is faster. It would be useful to
+temporarily set the variable to nil in scripting, e.g. for
+refiling many entries to a single file."
+  :group 'org-reverse-datetree
+  :type '(alist :key-type (choice (const marker)
+                                  (const point)
+                                  (const rfloc)
+                                  (const created)
+                                  (const default))
+                :value-type (choice (const minimal)
+                                    (const local)
+                                    (const ancestors)
+                                    (const lineage)
+                                    (const tree)
+                                    (const canonical))))
+
 (defvar-local org-reverse-datetree--file-headers nil
   "Alist of headers of the buffer.")
 
@@ -233,9 +263,12 @@ tree of the date tree, like a file+olp+datetree target of
                               nil
                               (point)))
                 ('created new)))))
-      (when org-reverse-datetree-show-context
-        (unless (org-invisible-p)
-          (org-show-context 'org-goto))))))
+      (when-let (visibility (or (cdr (assq (or return-type 'default)
+                                           org-reverse-datetree-show-context-detail))
+                                (when (not (eq return-type 'default))
+                                  (cdr (assq 'default
+                                             org-reverse-datetree-show-context-detail)))))
+        (org-show-set-visibility visibility)))))
 
 ;;;###autoload
 (cl-defun org-reverse-datetree-1 (&optional time
