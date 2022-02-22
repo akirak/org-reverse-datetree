@@ -118,18 +118,6 @@ in the Org header."
 
 (make-variable-buffer-local 'org-reverse-datetree-level-formats)
 
-(defcustom org-reverse-datetree-show-context t
-  "Whether to show the context of the destination date.
-
-When this option is non-nil, the date visited is shown using
-`org-show-context' if it is invisible.
-
-This is generally recommended in interactive use, but it slows
-down performance to some extent. When you refile many entries to
-a single file, you may want to turn off this option."
-  :group 'org-reverse-datetree
-  :type 'boolean)
-
 (defcustom org-reverse-datetree-show-context-detail
   '((default . ancestors))
   "Alist that defines how to show the context of the date entry.
