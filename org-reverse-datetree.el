@@ -45,6 +45,8 @@
 (declare-function org-element-map "ext:org-element")
 (declare-function org-element-parse-buffer "ext:org-element")
 (declare-function org-element-property "ext:org-element")
+(declare-function org-element-clock-parser "ext:org-element")
+(declare-function org-element-type "ext:org-element")
 (defvar org-agenda-buffer-name)
 (defvar org-agenda-bulk-marked-entries)
 (defvar org-agenda-persistent-marks)
@@ -88,6 +90,38 @@
 (defcustom org-reverse-datetree-date-format "%Y-%m-%d %A"
   "Date format used by org-reverse-datetree."
   :type '(choice string function)
+  :group 'org-reverse-datetree)
+
+(defcustom org-reverse-datetree-entry-time '((property "CLOSED")
+                                             (clock latest))
+  "How to determine the entry time unless explicitly specified.
+
+This is a list of patterns, and the first pattern takes
+precedence over the others.
+
+Each pattern takes one of the following expressions:
+
+  * (property PROPERTY...)
+
+    Return one of the property values, if available.
+
+    PROPERTY is a string for the name of a property in the entry.
+
+    You can specify, for example, \"CLOSED\".
+
+    You can specify multiple values.
+
+  * (clock ORDER)
+
+    Return a timestamp from one of the clock entries in the logbook.
+
+    ORDER can be either 'latest or 'earliest, which means the
+    latest and earliest timestamp is returned respectively."
+  :type '(repeat (choice (cons (const property)
+                               (repeat string))
+                         (list (const clock)
+                               (choice (const latest)
+                                       (const earliest)))))
   :group 'org-reverse-datetree)
 
 (defcustom org-reverse-datetree-find-function
@@ -628,46 +662,90 @@ OLP must be a list of strings."
       (funcall org-reverse-datetree-find-function
                level text :asc t))))
 
-(cl-defun org-reverse-datetree--get-entry-time (&key ask-always
-                                                     (prefer '("CLOSED")))
-  "Get an Emacs time for the current Org entry.
+(defun org-reverse-datetree--entry-time-2 (&optional time)
+  "Return an Emacs time for the current Org entry.
 
-This function retrieves a timestamp from a property of the entry.
-By default, it checks for the closed date of the entry.
-If there is no value set as the property, it asks for a date using
-`org-read-date' unless if ASK-ALWAYS is non-nil.
+TIME can take the same value as
+`org-reverse-datetree-refile-to-file', which see."
+  (pcase time
+    (`nil
+     (if org-reverse-datetree-entry-time
+         (org-reverse-datetree--entry-time-2 org-reverse-datetree-entry-time)
+       (org-read-date nil t)))
+    ((guard (ignore-errors (float-time time)))
+     time)
+    ((or `t '(4))
+     (org-read-date nil t))
+    ((pred consp)
+     (catch 'entry-time
+       (dolist (x (copy-sequence time))
+         (pcase x
+           (`(property . ,props)
+            (when-let (times (-some (lambda (property)
+                                      (org-entry-get nil property))
+                                    props))
+              (throw 'entry-time (org-reverse-datetree--timestamp-to-time times))))
+           (`(clock ,order)
+            (when-let (clocks (org-reverse-datetree--clocks))
+              (throw 'entry-time (cl-ecase order
+                                   (latest (car (-sort (-not #'time-less-p) clocks)))
+                                   (earliest (car (-sort #'time-less-p clocks)))))))
+           (_ (error "Unknown pattern: %s" x))))
+       (org-read-date nil t)))
+    (_
+     (error "Unsupported pattern: %s" time))))
 
-You can specify properties to retrieve a timestamp from by
-setting PREFER.  It can be a string or a list of strings.
-If it is a list, the first existing property property is used.
-
-This function returns an Emacs time."
-  (let ((attempt (-some (lambda (property)
-                          (org-entry-get nil property))
-                        (cl-typecase prefer
-                          (list prefer)
-                          (t (list prefer))))))
-    (cond
-     (ask-always
-      (org-read-date nil t nil nil
-                     (org-reverse-datetree--timestamp-to-time attempt)))
-     (attempt
-      (org-reverse-datetree--timestamp-to-time attempt))
-     (t (org-read-date nil t nil nil)))))
+(defun org-reverse-datetree--clocks ()
+  "Collect clocks for the current entry."
+  (require 'org-element)
+  (save-excursion
+    (org-back-to-heading)
+    (end-of-line 1)
+    (let* ((entry-end (org-entry-end-position))
+           (logbook-end (save-excursion
+                          (re-search-forward org-logbook-drawer-re entry-end t))))
+      (when logbook-end
+        (let (entries)
+          (while (re-search-forward org-clock-line-re logbook-end t)
+            (let ((clock (org-element-clock-parser (line-end-position))))
+              (when (and (eq 'clock (org-element-type clock))
+                         (eq 'closed (org-element-property :status clock)))
+                (let ((timestamp (org-element-property :value clock)))
+                  (push (encode-time (list 0
+                                           (org-element-property :minute-start timestamp)
+                                           (org-element-property :hour-start timestamp)
+                                           (org-element-property :day-start timestamp)
+                                           (org-element-property :month-start timestamp)
+                                           (org-element-property :year-start timestamp)
+                                           nil nil nil))
+                        entries)
+                  (push (encode-time (list 0
+                                           (org-element-property :minute-end timestamp)
+                                           (org-element-property :hour-end timestamp)
+                                           (org-element-property :day-end timestamp)
+                                           (org-element-property :month-end timestamp)
+                                           (org-element-property :year-end timestamp)
+                                           nil nil nil))
+                        entries)))))
+          entries)))))
 
 (cl-defun org-reverse-datetree--refile-to-file (file &optional time
                                                      &key ask-always prefer)
   "Refile the current single Org entry.
 
 This is used inside `org-reverse-datetree-refile-to-file' to
-refile a single tree.
-FILE, TIME, ASK-ALWAYS, and PREFER are the same as in the function.
+refile a single tree. FILE, TIME, ASK-ALWAYS, and PREFER are the
+same as in the function. ASK-ALWAYS and PREFER should be removed
+in the future.
 
 Return a string describing the operation."
-  (let* ((time (or time
-                   (org-reverse-datetree--get-entry-time
-                    :ask-always ask-always
-                    :prefer prefer)))
+  (let* ((time (org-reverse-datetree--entry-time-2
+                (cond
+                 (time time)
+                 (ask-always t)
+                 (prefer `(property ,@(cl-typecase prefer
+                                        (list prefer)
+                                        (t (list prefer))))))))
          (rfloc (with-current-buffer
                     (or (find-buffer-visiting file)
                         (find-file-noselect file))
@@ -687,11 +765,16 @@ This function refiles the current entry into a date tree in FILE
 configured in the headers of the file.  The same configuration as
 `org-reverse-datetree-goto-date-in-file' is used.
 
-The location in the date tree is specified by TIME, which is an
-Emacs time.  If TIME is not set, a timestamp is retrieved from
-properties of the current entry using
-`org-reverse-datetree--get-entry-time' with ASK-ALWAYS and PREFER
-as arguments."
+This function retrieves a timestamp from from the entry. Unless
+TIME is specified, `org-reverse-datetree-entry-time' determines
+how to pick a timestamp. If the argument is specified, it can
+take the same format (i.e. a list of patterns) as
+`org-reverse-datetree-entry-time' variable.
+
+Alternatively, you can set TIME to t, in which case a prompt is
+shown to let the user choose a date explicitly.
+
+ASK-ALWAYS and PREFER are deprecated."
   ;; NOTE: Based on org 9.3. Maybe needs updating in the future
   (pcase (derived-mode-p 'org-mode 'org-agenda-mode)
     ('org-mode
