@@ -134,23 +134,42 @@ With =org-reverse-datetree-refile-to-file=, you can define a function which can 
 #+begin_src emacs-lisp
   (defun akirak/org-refile-to-cpb (arg)
     (interactive "P")
-    (org-reverse-datetree-refile-to-file
-     (org-starter-locate-file "cpb.org" nil t) nil
-     :ask-always arg :prefer '("CREATED_TIME" "CREATED_AT" "CLOSED")))
+    (org-reverse-datetree-refile-to-file "~/org/cpb.org" arg))
 #+end_src
 
-The heading properties given as =:prefer= to the function are used to determine the date of an entry.
+The date is determined according to =org-reverse-datetree-entry-time= custom variable.
+If a =C-u= prefix argument is given, the user is asked to pick a date manually.
+
+The second argument can be an Emacs time.
+The following example refiles the current entry to today:
+
+#+begin_src emacs-lisp
+  (defun akirak/org-refile-to-cpb-today (arg)
+    (interactive "P")
+    (org-reverse-datetree-refile-to-file "~/org/cpb.org" (current-time)))
+#+end_src
+
+The second argument can also take the same format as =org-reverse-datetree-entry-time=.
+The following function refile the current entry according to =CREATED_AT= property or the earliest clock:
+
+#+begin_src emacs-lisp
+  (defun akirak/org-refile-to-cpb-2 (arg)
+    (interactive "P")
+    (org-reverse-datetree-refile-to-file "~/org/cpb.org"
+                                         '((property "CREATED_AT")
+                                           (clock earliest))))
+#+end_src
 
 You can use this function both in =org-mode= (either on a single entry or on multiple entries under selection) and in =org-agenda-mode= (either on a single entry or on bulk entries). It retrieves a date for each entry if it operates on multiple entries.
 
-=org-starter-locate-file= is a function from org-starter package, which locates the location of an Org file. If you don't use the package, you should give an absolute path:
+[[https://github.com/akirak/org-starter][org-starter]] package integrates with this function well.
+For example, you can define the following function:
 
 #+begin_src emacs-lisp
-  (defun akirak/org-refile-to-cpb (arg)
+  (defun akirak/org-refile-to-cpb (&optional arg)
     (interactive "P")
-    (org-reverse-datetree-refile-to-file
-     "~/org/cpb.org" nil
-     :ask-always arg :prefer '("CREATED_TIME" "CREATED_AT" "CLOSED")))
+    (org-reverse-datetree-refile-to-file (org-starter-locate-file "cpb.org" nil t)
+                                         arg))
 #+end_src
 
 A recommended way to invoke this command is to add an entry to =org-starter-extra-refile-map= in org-starter package:
