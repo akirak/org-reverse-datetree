@@ -18,7 +18,7 @@ activities on a particular subject using a search tool like
 
 :CONTENTS:
 - [[#features][Features]]
-- [[#prerequisites][Prerequisites]]
+- [[#installation][Installation]]
 - [[#usage][Usage]]
   - [[#configuring-date-formats][Configuring date formats]]
   - [[#defining-a-capture-template][Defining a capture template]]
@@ -37,10 +37,8 @@ activities on a particular subject using a search tool like
 - Week trees are also supported. You can even create date trees with four levels (year-month-week-date) or any number of levels.
 - Configurations of date trees are stored in file headers, so each file is ensured to have a single date tree with a consistent structure.
 - Configuration is done interactively on first creation.
-** Prerequisites
-- Emacs 26.1 or later
-- Org 9.3 or later
-- dash
+** Installation
+You can install this package from MELPA.
 ** Usage
 The following functions retrieve a configuration from the file header:
 
