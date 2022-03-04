@@ -45,4 +45,49 @@
       (expect (alist-get 1 headings)
               :to-equal '("Test" "2020")))))
 
+(describe "org-reverse-datetree--entry-time-2"
+  (describe "Default"
+    (let ((results (with-temp-buffer
+                     (insert-file-contents "test/time.org")
+                     ;; (setq buffer-file-name "test/time.org")
+                     (org-mode)
+                     (goto-char (point-min))
+                     (let ((org-reverse-datetree-entry-time
+                            (eval (car (get 'org-reverse-datetree-entry-time
+                                            'standard-value)))))
+                       (list (org-reverse-datetree--entry-time-2)
+                             (progn
+                               (re-search-forward (rx bol "** Child"))
+                               (org-reverse-datetree--entry-time-2)))))))
+      (it "takes the closed property if available"
+        (expect (nth 0 results)
+                :to-equal
+                (encode-time (list 0 12 22 26 2 2022 nil nil nil))))
+      (it "takes the latest clock finish"
+        (expect (nth 1 results)
+                :to-equal
+                (encode-time (list 0 5 2 20 1 2022 nil nil nil))))))
+
+  (describe "With an argument"
+    (let ((result (with-temp-buffer
+                    (insert-file-contents "test/time.org")
+                    ;; (setq buffer-file-name "test/time.org")
+                    (org-mode)
+                    (goto-char (point-min))
+                    (org-reverse-datetree--entry-time-2 '((property "CREATED_TIME"))))))
+      (it "takes the creation time if available"
+        (expect result
+                :to-equal
+                (encode-time (list 0 40 15 31 1 2022 nil nil nil)))))
+    (let ((result (with-temp-buffer
+                    (insert-file-contents "test/time.org")
+                    ;; (setq buffer-file-name "test/time.org")
+                    (org-mode)
+                    (goto-char (point-min))
+                    (org-reverse-datetree--entry-time-2 '((clock earliest))))))
+      (it "takes the earliest clock if available"
+        (expect result
+                :to-equal
+                (encode-time (list 0 40 15 31 1 2022 nil nil nil)))))))
+
 (provide 'org-reverse-datetree-test)
