@@ -248,6 +248,9 @@ You can use =org-reverse-datetree-cleanup-empty-dates= command to clean up date 
 :PROPERTIES:
 :TOC:      :depth 0
 :END:
+*** 0.3.9 (2022-03-04)
+- Add =org-reverse-datetree-entry-time= to allow customizing how to determine the date.
+- Make =org-reverse-datetree-refile-to-file= take =t= or patterns as the time argument.
 *** 0.3.8 (2022-02-22)
 - Add =org-reverse-datetree-show-context-detail= to allow customization of the behavior.
 *** 0.3.7 (2022-02-14)
