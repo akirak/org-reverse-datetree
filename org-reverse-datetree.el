@@ -188,6 +188,13 @@ refiling many entries to a single file."
 (defvar-local org-reverse-datetree-non-reverse nil
   "If non-nil, creates a non-reverse date tree.")
 
+(cl-eval-when (compile load)
+  (if (version< emacs-version "27")
+      (defun org-reverse-datetree--encode-time (time)
+        "Encode TIME using `encode-time'."
+        (apply #'encode-time time))
+    (defalias 'org-reverse-datetree--encode-time #'encode-time)))
+
 (cl-defun org-reverse-datetree--find-or-prepend (level text
                                                        &key append-newline
                                                        &allow-other-keys)
@@ -640,7 +647,7 @@ see."
 
 (defun org-reverse-datetree--timestamp-to-time (s)
   "Convert timestamp string S into internal time."
-  (apply #'encode-time (org-parse-time-string s)))
+  (org-reverse-datetree--encode-time (org-parse-time-string s)))
 
 (defun org-reverse-datetree--olp (olp)
   "Go to an outline path in the current buffer or create it.
@@ -711,21 +718,23 @@ TIME can take the same value as
               (when (and (eq 'clock (org-element-type clock))
                          (eq 'closed (org-element-property :status clock)))
                 (let ((timestamp (org-element-property :value clock)))
-                  (push (encode-time (list 0
-                                           (org-element-property :minute-start timestamp)
-                                           (org-element-property :hour-start timestamp)
-                                           (org-element-property :day-start timestamp)
-                                           (org-element-property :month-start timestamp)
-                                           (org-element-property :year-start timestamp)
-                                           nil nil nil))
+                  (push (org-reverse-datetree--encode-time
+                         (list 0
+                               (org-element-property :minute-start timestamp)
+                               (org-element-property :hour-start timestamp)
+                               (org-element-property :day-start timestamp)
+                               (org-element-property :month-start timestamp)
+                               (org-element-property :year-start timestamp)
+                               nil nil nil))
                         entries)
-                  (push (encode-time (list 0
-                                           (org-element-property :minute-end timestamp)
-                                           (org-element-property :hour-end timestamp)
-                                           (org-element-property :day-end timestamp)
-                                           (org-element-property :month-end timestamp)
-                                           (org-element-property :year-end timestamp)
-                                           nil nil nil))
+                  (push (org-reverse-datetree--encode-time
+                         (list 0
+                               (org-element-property :minute-end timestamp)
+                               (org-element-property :hour-end timestamp)
+                               (org-element-property :day-end timestamp)
+                               (org-element-property :month-end timestamp)
+                               (org-element-property :year-end timestamp)
+                               nil nil nil))
                         entries)))))
           entries)))))
 
@@ -914,9 +923,9 @@ A prefix argument FIND-DONE should be treated as in
                            ((find-buffer-visiting afile))
                            ((find-file-noselect afile))
                            (t (error "Cannot access file \"%s\"" afile))))
-             (archive-time (apply #'encode-time
-                                  (org-parse-time-string
-                                   (or (org-entry-get nil "CLOSED" t) time)))))
+             (archive-time (org-reverse-datetree--encode-time
+                            (org-parse-time-string
+                             (or (org-entry-get nil "CLOSED" t) time)))))
         (save-excursion
           (org-back-to-heading t)
           ;; Get context information that will be lost by moving the
