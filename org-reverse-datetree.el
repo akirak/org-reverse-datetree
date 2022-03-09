@@ -188,7 +188,7 @@ refiling many entries to a single file."
 (defvar-local org-reverse-datetree-non-reverse nil
   "If non-nil, creates a non-reverse date tree.")
 
-(cl-eval-when (compile load)
+(eval-and-compile
   (if (version< emacs-version "27")
       (defun org-reverse-datetree--encode-time (time)
         "Encode TIME using `encode-time'."
