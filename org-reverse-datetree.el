@@ -93,7 +93,8 @@
   :group 'org-reverse-datetree)
 
 (defcustom org-reverse-datetree-entry-time '((property "CLOSED")
-                                             (clock latest))
+                                             (clock latest)
+                                             (match :type inactive))
   "How to determine the entry time unless explicitly specified.
 
 This is a list of patterns, and the first pattern takes
@@ -116,12 +117,33 @@ Each pattern takes one of the following expressions:
     Return a timestamp from one of the clock entries in the logbook.
 
     ORDER can be either 'latest or 'earliest, which means the
-    latest and earliest timestamp is returned respectively."
-  :type '(repeat (choice (cons (const property)
-                               (repeat string))
-                         (list (const clock)
-                               (choice (const latest)
-                                       (const earliest)))))
+    latest and earliest timestamp is returned respectively.
+
+  * (match PLIST)
+
+    Return the first match of a timestamp in the entry.
+
+    PLIST can specify options."
+  :type '(repeat
+          (choice (cons :tag "Property"
+                        (const property)
+                        (repeat string))
+                  (list :tag "Clock entry in the drawer"
+                        (const clock)
+                        (choice (const latest)
+                                (const earliest)))
+                  (cons :tag "First regexp match of inactive clock"
+                        (const match)
+                        (plist :tag "Properties"
+                               :option
+                               ((list :tag "Type of timestamp"
+                                      (const :type)
+                                      (choice (const :tag "Inactive timestamps (default)"
+                                                     inactive)
+                                              (const :tag "Active timestamps"
+                                                     active)
+                                              (const :tag "Active and inactive timestamps"
+                                                     any))))))))
   :group 'org-reverse-datetree)
 
 (defcustom org-reverse-datetree-find-function
@@ -697,6 +719,18 @@ TIME can take the same value as
               (throw 'entry-time (cl-ecase order
                                    (latest (car (-sort (-not #'time-less-p) clocks)))
                                    (earliest (car (-sort #'time-less-p clocks)))))))
+           (`(match . ,plist)
+            (let ((regexp (pcase (plist-get plist :type)
+                            ('any org-ts-regexp-both)
+                            ('active org-ts-regexp)
+                            (_ org-ts-regexp-inactive)))
+                  (bound (save-excursion
+                           (org-entry-end-position))))
+              (save-excursion
+                (org-back-to-heading)
+                (when (re-search-forward regexp bound t)
+                  (throw 'entry-time (org-reverse-datetree--timestamp-to-time
+                                      (match-string 1)))))))
            (_ (error "Unknown pattern: %s" x))))
        (org-read-date nil t)))
     (_
