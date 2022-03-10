@@ -92,6 +92,42 @@
         (expect result
                 :to-equal
                 (org-reverse-datetree--encode-time
-                 (list 0 40 15 31 1 2022 nil nil nil)))))))
+                 (list 0 40 15 31 1 2022 nil nil nil)))))
+    (pcase-let ((`(,result-inactive ,result-active)
+                 (with-temp-buffer
+                   (insert-file-contents "test/time.org")
+                   ;; (setq buffer-file-name "test/time.org")
+                   (org-mode)
+                   (goto-char (org-find-property "CUSTOM_ID" "clock-in-heading-1"))
+                   (list (org-reverse-datetree--entry-time-2 '((match :type inactive)))
+                         (org-reverse-datetree--entry-time-2 '((match :type active)))))))
+      (it "matches the first inactive clock"
+        (expect result-inactive
+                :to-equal
+                (org-reverse-datetree--encode-time
+                 (list 0 0 0 10 3 2022 nil nil nil))))
+      (it "matches the first active clock"
+        (expect result-active
+                :to-equal
+                (org-reverse-datetree--encode-time
+                 (list 0 33 15 24 2 2022 nil nil nil)))))
+    (pcase-let ((`(,result-any ,result-default)
+                 (with-temp-buffer
+                   (insert-file-contents "test/time.org")
+                   ;; (setq buffer-file-name "test/time.org")
+                   (org-mode)
+                   (goto-char (org-find-property "CUSTOM_ID" "clock-in-heading-2"))
+                   (list (org-reverse-datetree--entry-time-2 '((match :type any)))
+                         (org-reverse-datetree--entry-time-2 '((match :type nil)))))))
+      (it "matches the first any clock"
+        (expect result-any
+                :to-equal
+                (org-reverse-datetree--encode-time
+                 (list 0 24 12 1 3 2022 nil nil nil))))
+      (it "matches the first inactive clock"
+        (expect result-default
+                :to-equal
+                (org-reverse-datetree--encode-time
+                 (list 0 0 0 10 3 2022 nil nil nil)))))))
 
 (provide 'org-reverse-datetree-test)
