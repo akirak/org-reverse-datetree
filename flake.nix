@@ -29,7 +29,6 @@
         "org-reverse-datetree"
       ];
       extraPackages = [
-        "buttercup"
         # Emacs 26.2 or before requires installation of a newer version of Org
         "org"
       ];
@@ -37,6 +36,9 @@
         test = {
           description = "Run buttercup tests";
           compile = true;
+          extraPackages = [
+            "buttercup"
+          ];
           text = ''
             emacs -batch -l buttercup -f buttercup-run-discover "$PWD"
           '';
