@@ -1,4 +1,4 @@
-name: 'lint'
+name: 'package-lint'
 on: { push: { paths: [ '**.el' ] } }
 jobs:
   lint:
@@ -10,7 +10,7 @@ jobs:
     - uses: purcell/setup-emacs@master
       with:
         version: ${{ matrix.emacs_version }}
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
     - name: Install dependencies
       run: |
         cat <(jq -r '.nodes.root.inputs | map(.) | .[]' .nomake/flake.lock) \
@@ -33,11 +33,11 @@ jobs:
     - name: Byte-compile
       if: ${{ false }}
       run: |
-        emacs -batch -l bytecomp -l package --eval "(package-initialize)" -L . \
+        emacs -batch -l bytecomp -l package --eval "(push '(\"melpa\" . \"https://melpa.org/packages/\") package-archives)" --eval "(package-initialize)" -L . \
           --eval "(setq byte-compile-error-on-warn t)" \
           -f batch-byte-compile 'org-reverse-datetree.el'
     - run: |
-        emacs -l package --eval "(package-initialize)" -L . -batch -l package-lint \
+        emacs -l package --eval "(push '(\"melpa\" . \"https://melpa.org/packages/\") package-archives)" --eval "(package-initialize)" -L . -batch -l package-lint \
           --eval "(setq package-lint-main-file \"org-reverse-datetree.el\")" \
           -f package-lint-batch-and-exit 'org-reverse-datetree.el'
       name: Run package-lint
