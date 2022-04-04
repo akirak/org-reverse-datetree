@@ -1,7 +1,5 @@
 name: 'test'
-on:
-  push:
-# on: { push: { paths: [ '**.el' ] } }
+on: { push: { paths: [ '**.el' ] } }
 jobs:
   test:
     runs-on: ubuntu-latest
