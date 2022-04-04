@@ -3,11 +3,11 @@
     "buttercup": {
       "flake": false,
       "locked": {
-        "lastModified": 1640908139,
-        "narHash": "sha256-ZX0h/WZiQYHx/dNdkvCnE6J3A77bA/ygwweA6FmnyB0=",
+        "lastModified": 1648586608,
+        "narHash": "sha256-qGZYc9ECJ28ZjazpGUqY8Z7fdbdWCA0/ujtd0CWD8qA=",
         "owner": "jorgenschaefer",
         "repo": "emacs-buttercup",
-        "rev": "1cb7afcb0b6d87a3e623dc26ffcb2c7d4d6dd280",
+        "rev": "f5cbf97e1086441b2d6fa3ea240758b932c7c5e1",
         "type": "github"
       },
       "original": {
@@ -35,11 +35,11 @@
     "org": {
       "flake": false,
       "locked": {
-        "lastModified": 1644786821,
-        "narHash": "sha256-rYk4wiCOeCkM1b4dxYc7/TbvqfN2PvSpmb9UUlbHpFQ=",
+        "lastModified": 1648740710,
+        "narHash": "sha256-yqLzec7jH1UfR05UVl7KzTtKgOqHz1clSIpUWuiF5AY=",
         "ref": "bugfix",
-        "rev": "17e4fe90930596ba5cdf82223b9f5de9040a9581",
-        "revCount": 24610,
+        "rev": "64ee5c2c47e0167f4cd4740a8d57731d30d47b68",
+        "revCount": 24629,
         "type": "git",
         "url": "git://git.sv.gnu.org/emacs/org-mode.git"
       },
@@ -52,11 +52,11 @@
     "org-reverse-datetree": {
       "flake": false,
       "locked": {
-        "lastModified": 1642669669,
-        "narHash": "sha256-gaIvhN1BeJgaBRVMESrs6RzJESZX8viBRb3ZRZyMRTI=",
+        "lastModified": 1646930854,
+        "narHash": "sha256-oraw+Io/nt24LMAO8RTNyMUMIKSpkP+oaqYuyazZ1ak=",
         "owner": "akirak",
         "repo": "org-reverse-datetree",
-        "rev": "341e829a730dd9eb1c14e2588fecb3ad7361f989",
+        "rev": "c42078f8601b7f600135f66e75246a53c5f9975f",
         "type": "github"
       },
       "original": {
