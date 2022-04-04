@@ -1,9 +1,0 @@
-#+title: Notes on org-reverse-datetree
-* TODO [#A] Workaround on four-level structure
-Support this feature https://github.com/akirak/org-reverse-datetree/issues/4#issuecomment-495827014 without using a function in the format.
-* TODO Adding tests
-:PROPERTIES:
-:CREATED_TIME: [2020-02-24 Mon 14:41]
-:END:
-This package currently has only linting, and its functions are not tested.
-I am using it daily
