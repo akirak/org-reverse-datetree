@@ -163,11 +163,11 @@
         "twist": "twist"
       },
       "locked": {
-        "lastModified": 1649092635,
-        "narHash": "sha256-YHbz2sONN8WI6lqYNODcJpKwg4fuRP+bSYYjqUY0vhc=",
+        "lastModified": 1649104946,
+        "narHash": "sha256-X+qrnusRL/QxvTsrQ3o9qf3V9ENLxlQfWqt4HC0JAtE=",
         "owner": "emacs-twist",
         "repo": "nomake",
-        "rev": "72c9fb28af5c74df412905df77127c99ee5172ef",
+        "rev": "6392764a9e31edc0778a54e84e29dced0a1d2598",
         "type": "github"
       },
       "original": {
