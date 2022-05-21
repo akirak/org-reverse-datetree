@@ -373,36 +373,54 @@ For RETURN, see the documentation of `org-reverse-datetree-2'."
            org-reverse-datetree-week-format
            org-reverse-datetree-date-format))))
 
-(defun org-reverse-datetree--get-level-formats ()
-  "Return a list of outline formats for the current buffer."
+(defun org-reverse-datetree--get-level-formats (&optional allow-failure)
+  "Return a list of outline formats for the current buffer.
+
+If ALLOW-FAILURE is non-nil, it returns nil if the buffer does
+not have a datetree format configured."
   (or org-reverse-datetree-level-formats
       (progn
         (org-reverse-datetree--get-file-headers)
-        (let* ((type (org-reverse-datetree--lookup-type-header-1))
-               (org-reverse-datetree-year-format
-                (org-reverse-datetree--lookup-format-header
-                 "REVERSE_DATETREE_YEAR_FORMAT"
-                 "Year format: "
-                 org-reverse-datetree-year-format))
-               (org-reverse-datetree-month-format
-                (when (memq type '(month month-and-week))
-                  (org-reverse-datetree--lookup-format-header
-                   "REVERSE_DATETREE_MONTH_FORMAT"
-                   "Month format: "
-                   org-reverse-datetree-month-format)))
-               (org-reverse-datetree-week-format
-                (when (memq type '(week month-and-week))
-                  (org-reverse-datetree--lookup-format-header
-                   "REVERSE_DATETREE_WEEK_FORMAT"
-                   "Week format: "
-                   org-reverse-datetree-week-format)))
-               (org-reverse-datetree-date-format
-                (org-reverse-datetree--lookup-format-header
-                 "REVERSE_DATETREE_DATE_FORMAT"
-                 "Date format: "
-                 org-reverse-datetree-date-format))
-               (org-reverse-datetree-level-formats))
-          (org-reverse-datetree--level-formats type)))))
+        (catch 'datetree-format
+          (let* ((type (org-reverse-datetree--lookup-type-header-1
+                        allow-failure))
+                 (org-reverse-datetree-year-format
+                  (or (org-reverse-datetree--lookup-format-header
+                       "REVERSE_DATETREE_YEAR_FORMAT"
+                       "Year format: "
+                       org-reverse-datetree-year-format
+                       allow-failure)
+                      (throw 'datetree-format nil)))
+                 (org-reverse-datetree-month-format
+                  (when (memq type '(month month-and-week))
+                    (or (org-reverse-datetree--lookup-format-header
+                         "REVERSE_DATETREE_MONTH_FORMAT"
+                         "Month format: "
+                         org-reverse-datetree-month-format
+                         allow-failure)
+                        (throw 'datetree-format nil))))
+                 (org-reverse-datetree-week-format
+                  (when (memq type '(week month-and-week))
+                    (or (org-reverse-datetree--lookup-format-header
+                         "REVERSE_DATETREE_WEEK_FORMAT"
+                         "Week format: "
+                         org-reverse-datetree-week-format
+                         allow-failure)
+                        (throw 'datetree-format nil))))
+                 (org-reverse-datetree-date-format
+                  (or (org-reverse-datetree--lookup-format-header
+                       "REVERSE_DATETREE_DATE_FORMAT"
+                       "Date format: "
+                       org-reverse-datetree-date-format
+                       allow-failure)
+                      (throw 'datetree-format nil)))
+                 (org-reverse-datetree-level-formats))
+            (org-reverse-datetree--level-formats type))))))
+
+(defun org-reverse-datetree-configured-p ()
+  "Return non-nil if the buffer has a datetree."
+  (when (org-reverse-datetree--get-level-formats t)
+    t))
 
 (cl-defun org-reverse-datetree--find-or-insert (level text
                                                       &key asc
@@ -529,29 +547,34 @@ TEXT is a heading text."
     (org-reverse-datetree--get-file-headers))
   (cdr (assoc key org-reverse-datetree--file-headers)))
 
-(defun org-reverse-datetree--lookup-type-header-1 ()
+(defun org-reverse-datetree--lookup-type-header-1 (&optional fail-if-missing)
   "Look up a boolean file header or ask for a value.
 
 This function looks up KEY from the file headers.  If the key is
 not contained, it asks for a new value with PROMPT, inserts the value
-into the header, and returns the value."
+into the header, and returns the value.
+
+If FAIL-IF-MISSING is non-nil and the key does not exist, this
+function returns nil."
   (let ((header "REVERSE_DATETREE_USE_WEEK_TREE"))
     (pcase (org-reverse-datetree--lookup-header header)
       ("month-and-week" 'month-and-week)
       ("t" 'week)
       ("nil" 'month)
-      ('nil (let* ((char (read-char-choice "Choose a datetree type ([y/w] week, [n/m] month, [b] week and month): "
-                                           (string-to-list "ywnmb")))
-                   (value (cl-case char
-                            ((?y ?w) 'week)
-                            ((?n ?m) 'month)
-                            ((?b) 'month-and-week))))
-              (org-reverse-datetree--insert-header header
-                                                   (cl-case value
-                                                     (week "t")
-                                                     (month "nil")
-                                                     (month-and-week "month-and-week")))
-              value)))))
+      ('nil (unless fail-if-missing
+              (let* ((char (read-char-choice
+                            "Choose a datetree type ([y/w] week, [n/m] month, [b] week and month): "
+                            (string-to-list "ywnmb")))
+                     (value (cl-case char
+                              ((?y ?w) 'week)
+                              ((?n ?m) 'month)
+                              ((?b) 'month-and-week))))
+                (org-reverse-datetree--insert-header header
+                                                     (cl-case value
+                                                       (week "t")
+                                                       (month "nil")
+                                                       (month-and-week "month-and-week")))
+                value))))))
 
 (defun org-reverse-datetree--parse-format (raw)
   "Parse a RAW time format string in the header.
@@ -567,18 +590,23 @@ is a string passed to `format-time-string' as the first argument."
    (t
     raw)))
 
-(defun org-reverse-datetree--lookup-format-header (key prompt initial)
+(defun org-reverse-datetree--lookup-format-header (key prompt initial
+                                                       &optional fail-if-missing)
   "Look up a string file header or ask for a value.
 
 This function looks up KEY from the file headers.  If the key is
 not contained, it asks for a new value with PROMPT with INITIAL
-as the default value, inserts the value, and returns the value."
+as the default value, inserts the value, and returns the value.
+
+If FAIL-IF-MISSING is non-nil and the key does not exist, this
+function returns nil."
   (if-let ((value (org-reverse-datetree--lookup-header key)))
       (org-reverse-datetree--parse-format (string-trim value))
-    (let* ((raw (read-string prompt initial))
-           (ret (org-reverse-datetree--parse-format raw)))
-      (org-reverse-datetree--insert-header key raw)
-      ret)))
+    (unless fail-if-missing
+      (let* ((raw (read-string prompt initial))
+             (ret (org-reverse-datetree--parse-format raw)))
+        (org-reverse-datetree--insert-header key raw)
+        ret))))
 
 (defun org-reverse-datetree--lookup-string-header (key prompt initial)
   "Look up a string file header or ask for a value.
