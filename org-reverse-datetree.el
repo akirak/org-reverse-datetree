@@ -1160,55 +1160,56 @@ are deleted without confirmation as well."
                  (not (called-interactively-p 'any)))
              (not noconfirm))
     (error "Please set NOCONFIRM when called non-interactively"))
-  (let ((levels (length (org-reverse-datetree--get-level-formats)))
+  (let ((levels (length (org-reverse-datetree--get-level-formats t)))
         count)
-    (org-save-outline-visibility t
-      (outline-hide-sublevels (1+ levels))
-      (when (or noconfirm
-                (and (not (org-before-first-heading-p))
-                     (yes-or-no-p "Start from the beginning?")))
-        (goto-char (point-min)))
-      (catch 'abort
-        (while (> levels 0)
-          (setq count 0)
-          (while (re-search-forward
-                  (rx-to-string `(and bol
-                                      (group (= ,levels "*")
-                                             (+ " ")
-                                             (*? nonl)
-                                             (+ "\n"))
-                                      (or string-end
-                                          (and (** 1 ,levels "*")
-                                               " "))))
-                  nil t)
-            (let ((begin (match-beginning 1))
-                  (end (match-end 1)))
-              (cond
-               (noconfirm
-                (delete-region begin end)
-                (cl-incf count)
-                (goto-char begin))
-               ((not noninteractive)
-                (goto-char begin)
-                (push-mark end)
-                (setq mark-active t)
-                (when (yes-or-no-p "Delete this empty entry?")
-                  (call-interactively #'delete-region)
+    (when (> levels 0)
+      (org-save-outline-visibility t
+        (outline-hide-sublevels (1+ levels))
+        (when (or noconfirm
+                  (and (not (org-before-first-heading-p))
+                       (yes-or-no-p "Start from the beginning?")))
+          (goto-char (point-min)))
+        (catch 'abort
+          (while (> levels 0)
+            (setq count 0)
+            (while (re-search-forward
+                    (rx-to-string `(and bol
+                                        (group (= ,levels "*")
+                                               (+ " ")
+                                               (*? nonl)
+                                               (+ "\n"))
+                                        (or string-end
+                                            (and (** 1 ,levels "*")
+                                                 " "))))
+                    nil t)
+              (let ((begin (match-beginning 1))
+                    (end (match-end 1)))
+                (cond
+                 (noconfirm
+                  (delete-region begin end)
                   (cl-incf count)
-                  (goto-char begin))))))
-          (when (= count 0)
-            (message "No trees were deleted. Aborting")
-            (throw 'abort t))
-          (if (and (> levels 1)
-                   (or (and ancestors
-                            noconfirm)
-                       (and (not noninteractive)
-                            (called-interactively-p 'any)
-                            (yes-or-no-p "Clean up the upper level as well?"))))
-              (progn
-                (cl-decf levels)
-                (goto-char (point-min)))
-            (throw 'abort t)))))))
+                  (goto-char begin))
+                 ((not noninteractive)
+                  (goto-char begin)
+                  (push-mark end)
+                  (setq mark-active t)
+                  (when (yes-or-no-p "Delete this empty entry?")
+                    (call-interactively #'delete-region)
+                    (cl-incf count)
+                    (goto-char begin))))))
+            (when (= count 0)
+              (message "No trees were deleted. Aborting")
+              (throw 'abort t))
+            (if (and (> levels 1)
+                     (or (and ancestors
+                              noconfirm)
+                         (and (not noninteractive)
+                              (called-interactively-p 'any)
+                              (yes-or-no-p "Clean up the upper level as well?"))))
+                (progn
+                  (cl-decf levels)
+                  (goto-char (point-min)))
+              (throw 'abort t))))))))
 
 ;;;; Other public functions for convenience
 
@@ -1230,27 +1231,28 @@ level. The entire headline of the parent date entry will be
 passed to FUNC.
 
 It returns a list of results returned by the function."
-  (let* ((formats (org-reverse-datetree--get-level-formats))
+  (let* ((formats (org-reverse-datetree--get-level-formats t))
          (heading-regexp (rx-to-string `(and bol
                                              ,(make-string (length formats) ?\*)
                                              (+ blank)
                                              ,@(when date-regexp
                                                  `((group (regexp ,date-regexp)))))))
          result)
-    (while (re-search-forward heading-regexp nil t)
-      (let ((date (if date-regexp
-                      (match-string-no-properties 1)
-                    (substring-no-properties (org-get-heading t t t t))))
-            (level (org-get-valid-level (1+ (org-outline-level))))
-            (bound (save-excursion
-                     (org-end-of-subtree))))
-        (while (re-search-forward org-heading-regexp bound t)
-          (when (= (org-outline-level) level)
-            (beginning-of-line)
-            (push (save-excursion
-                    (funcall func date))
-                  result))
-          (end-of-line))))
+    (when formats
+      (while (re-search-forward heading-regexp nil t)
+        (let ((date (if date-regexp
+                        (match-string-no-properties 1)
+                      (substring-no-properties (org-get-heading t t t t))))
+              (level (org-get-valid-level (1+ (org-outline-level))))
+              (bound (save-excursion
+                       (org-end-of-subtree))))
+          (while (re-search-forward org-heading-regexp bound t)
+            (when (= (org-outline-level) level)
+              (beginning-of-line)
+              (push (save-excursion
+                      (funcall func date))
+                    result))
+            (end-of-line)))))
     (nreverse result)))
 
 (provide 'org-reverse-datetree)
