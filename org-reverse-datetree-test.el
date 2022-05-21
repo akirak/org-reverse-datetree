@@ -130,4 +130,54 @@
                 (org-reverse-datetree--encode-time
                  (list 0 0 0 10 3 2022 nil nil nil)))))))
 
+(describe "org-reverse-datetree-map-entries"
+
+  (describe "With DATE-REGEXP"
+    (it "calls FUNC with the matched string"
+
+      (expect (with-temp-buffer
+                (insert-file-contents "test/month.org")
+                (setq buffer-file-name "test/month.org")
+                (set-buffer-modified-p nil)
+                (org-mode)
+                (goto-char (point-min))
+                (org-reverse-datetree-map-entries
+                 (lambda (date)
+                   (list date (org-get-heading)))
+                 :date-regexp "2021-[[:digit:]]\\{2\\}-[[:digit:]]\\{2\\}"))
+              :to-equal '(("2021-04-02" "A")
+                          ("2021-04-01" "B")
+                          ("2021-01-01" "C")))))
+
+  (describe "Without DATE-REGEXP"
+    (it "calls FUNC with the matched string"
+
+      (expect (with-temp-buffer
+                (insert-file-contents "test/month.org")
+                (setq buffer-file-name "test/month.org")
+                (set-buffer-modified-p nil)
+                (org-mode)
+                (goto-char (point-min))
+                (org-reverse-datetree-map-entries
+                 (lambda (date)
+                   (list date (org-get-heading)))))
+              :to-equal '(("2021-04-02 Friday" "A")
+                          ("2021-04-01 Thursday" "B")
+                          ("2021-01-01 Friday" "C")
+                          ("2020-12-31 Thursday" "D")
+                          ("2020-12-31 Thursday" "E")))
+
+      (expect (with-temp-buffer
+                (insert-file-contents "test/month-and-week.org")
+                (setq buffer-file-name "test/month-and-week.org")
+                (set-buffer-modified-p nil)
+                (org-mode)
+                (goto-char (point-min))
+                (org-reverse-datetree-map-entries
+                 (lambda (date)
+                   (list date (org-get-heading)))))
+              :to-equal '(("2021-02-01 Monday" "X")
+                          ("2021-01-01 Friday" "Y")
+                          ("2020-08-01 Saturday" "Z"))))))
+
 (provide 'org-reverse-datetree-test)

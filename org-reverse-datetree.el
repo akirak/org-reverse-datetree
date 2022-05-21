@@ -1182,5 +1182,48 @@ are deleted without confirmation as well."
                 (goto-char (point-min)))
             (throw 'abort t)))))))
 
+;;;; Other public functions for convenience
+
+(cl-defun org-reverse-datetree-map-entries (func &key date-regexp)
+  "Call a function at each child of date entries.
+
+This is like `org-map-entries', but for the datetree. Instead of
+calling a function at each headline in the buffer, it is called
+at each direct child of date entries.
+
+FUNC is called with the date as an argument.
+
+If DATE-REGEXP is a string, it is used to match against the
+headline text, and the matched text is given as the argument. The
+entire date is skipped if the regular expression does not match.
+
+If DATE-REGEXP is nil, if matches all the headings at a certain
+level. The entire headline of the parent date entry will be
+passed to FUNC.
+
+It returns a list of results returned by the function."
+  (let* ((formats (org-reverse-datetree--get-level-formats))
+         (heading-regexp (rx-to-string `(and bol
+                                             ,(make-string (length formats) ?\*)
+                                             (+ blank)
+                                             ,@(when date-regexp
+                                                 `((group (regexp ,date-regexp)))))))
+         result)
+    (while (re-search-forward heading-regexp nil t)
+      (let ((date (if date-regexp
+                      (match-string-no-properties 1)
+                    (substring-no-properties (org-get-heading t t t t))))
+            (level (org-get-valid-level (1+ (org-outline-level))))
+            (bound (save-excursion
+                     (org-end-of-subtree))))
+        (while (re-search-forward org-heading-regexp bound t)
+          (when (= (org-outline-level) level)
+            (beginning-of-line)
+            (push (save-excursion
+                    (funcall func date))
+                  result))
+          (end-of-line))))
+    (nreverse result)))
+
 (provide 'org-reverse-datetree)
 ;;; org-reverse-datetree.el ends here
