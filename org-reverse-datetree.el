@@ -116,7 +116,7 @@ Each pattern takes one of the following expressions:
 
     Return a timestamp from one of the clock entries in the logbook.
 
-    ORDER can be either 'latest or 'earliest, which means the
+    ORDER can be either \\='latest or \\='earliest, which means the
     latest and earliest timestamp is returned respectively.
 
   * (match PLIST)
