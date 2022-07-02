@@ -3,6 +3,15 @@
 (require 'buttercup)
 (require 'org-reverse-datetree)
 
+(defmacro org-reverse-datetree-test-with-file (file &rest progn)
+  (declare (indent 1))
+  `(with-temp-buffer
+     (insert-file-contents ,file)
+     (setq buffer-file-name ,file)
+     (set-buffer-modified-p nil)
+     (org-mode)
+     ,@progn))
+
 (defun org-reverse-datetree-test--collect-headings (level)
   (let (result)
     (goto-char (point-min))
@@ -179,5 +188,60 @@
               :to-equal '(("2021-02-01 Monday" "X")
                           ("2021-01-01 Friday" "Y")
                           ("2020-08-01 Saturday" "Z"))))))
+
+(describe "org-reverse-datetree-guess-date"
+
+  (it "returns nil when the entry is outside of the datetree"
+    (expect (org-reverse-datetree-test-with-file "test/month.org"
+              (goto-char (point-min))
+              (org-reverse-datetree-guess-date))
+            :to-be nil)
+
+    (expect (org-reverse-datetree-test-with-file "test/mixed.org"
+              (goto-char (point-max))
+              (org-reverse-datetree-guess-date))
+            :to-be nil))
+
+  (it "returns nil when the file has no datetree"
+    (expect (org-reverse-datetree-test-with-file "test/no-datetree.org"
+              (goto-char (point-min))
+              (save-match-data
+                (re-search-forward org-heading-regexp))
+              (org-reverse-datetree-guess-date))
+            :to-be nil))
+
+  (it "returns nil when the entry is not under a date, e.g. on a year or month"
+    (expect (org-reverse-datetree-test-with-file "test/month.org"
+              (goto-char (point-min))
+              (search-forward "** 2021-04")
+              (org-reverse-datetree-guess-date))
+            :to-be nil))
+
+  (it "returns the date when the entry is on a date"
+    (expect (org-reverse-datetree-test-with-file "test/month.org"
+              (goto-char (point-min))
+              (search-forward "*** 2021-04-02 Friday")
+              (org-reverse-datetree-guess-date))
+            :to-equal (org-reverse-datetree--encode-time
+                       (append '(0 0 0 2 4 2021)
+                               (seq-drop (decode-time (current-time)) 6)))))
+
+  (it "returns the date when the entry is under a date"
+    (expect (org-reverse-datetree-test-with-file "test/month.org"
+              (goto-char (point-min))
+              (search-forward "**** B")
+              (org-reverse-datetree-guess-date))
+            :to-equal (org-reverse-datetree--encode-time
+                       (append '(0 0 0 1 4 2021)
+                               (seq-drop (decode-time (current-time)) 6)))))
+
+  (it "returns a decoded time when :decoded is non-nil"
+    (expect (org-reverse-datetree-test-with-file "test/month.org"
+              (goto-char (point-min))
+              (search-forward "**** B")
+              (thread-first
+                (org-reverse-datetree-guess-date :decoded t)
+                (seq-take 6)))
+            :to-equal '(nil nil nil 1 4 2021))))
 
 (provide 'org-reverse-datetree-test)

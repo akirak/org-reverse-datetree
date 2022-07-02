@@ -1,0 +1,13 @@
+#+REVERSE_DATETREE_USE_WEEK_TREE: nil
+#+REVERSE_DATETREE_DATE_FORMAT: %Y-%m-%d %A
+#+REVERSE_DATETREE_MONTH_FORMAT: %Y-%m
+#+REVERSE_DATETREE_YEAR_FORMAT: %Y
+* 2020
+** 2020-12
+*** 2020-12-31 Thursday
+**** D
+**** E
+* Non-datetree
+** This is not a datetree
+*** This is not a date
+**** Child
