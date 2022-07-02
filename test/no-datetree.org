@@ -1,0 +1,2 @@
+#+title: Org File without a Date Tree
+* Sample
