@@ -1274,10 +1274,9 @@ Unless DECODED is non-nil, the returned date is an encoded time,
 so it can be passed to other functions in `org-reverse-datetree'
 package. The encoded time will be the midnight in the day."
   (unless (org-before-first-heading-p)
-    (let* ((formats (org-reverse-datetree--get-level-formats t))
-           (level (length formats))
-           (current-level (org-outline-level)))
-      (when (and formats
+    (let ((level (org-reverse-datetree-num-levels))
+          (current-level (org-outline-level)))
+      (when (and level
                  (>= current-level level))
         (org-with-wide-buffer
          (when (> current-level level)
