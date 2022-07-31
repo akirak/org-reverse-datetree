@@ -210,6 +210,8 @@ refiling many entries to a single file."
 (defvar-local org-reverse-datetree-non-reverse nil
   "If non-nil, creates a non-reverse date tree.")
 
+(defvar-local org-reverse-datetree-num-levels nil)
+
 (eval-and-compile
   (if (version< emacs-version "27")
       (defun org-reverse-datetree--encode-time (time)
@@ -380,6 +382,7 @@ If ALLOW-FAILURE is non-nil, it returns nil if the buffer does
 not have a datetree format configured."
   (or org-reverse-datetree-level-formats
       (progn
+        (setq org-reverse-datetree-num-levels nil)
         (org-reverse-datetree--get-file-headers)
         (catch 'datetree-format
           (let* ((type (org-reverse-datetree--lookup-type-header-1
@@ -1291,6 +1294,23 @@ package. The encoded time will be the midnight in the day."
                (org-reverse-datetree--encode-time
                 (append '(0 0 0)
                         (seq-drop decoded-time 3)))))))))))
+
+(defun org-reverse-datetree-num-levels ()
+  "Return the number of outline levels of datetree entries.
+
+If the file does not contain a datetree configured, it returns
+nil.
+
+This uses a cached value whenever available, so it is faster than
+calling `org-reverse-datetree--get-level-formats'."
+  (if org-reverse-datetree-level-formats
+      (length org-reverse-datetree-level-formats)
+    (let ((levels (or org-reverse-datetree-num-levels
+                      (setq org-reverse-datetree-num-levels
+                            (length (org-reverse-datetree--get-level-formats t))))))
+      ;; If the file contains no datetree, the cached value is set to zero,
+      (unless (= 0 levels)
+        levels))))
 
 (provide 'org-reverse-datetree)
 ;;; org-reverse-datetree.el ends here
