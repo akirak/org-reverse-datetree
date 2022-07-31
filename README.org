@@ -249,6 +249,9 @@ You can use =org-reverse-datetree-cleanup-empty-dates= command to clean up date 
 :PROPERTIES:
 :TOC:      :depth 0
 :END:
+*** 0.3.13 (2022-07-31)
+- Optimize the header reading by narrowing.
+- Add =org-reverse-datetree-num-levels= function.
 *** 0.3.12 (2022-07-02)
 - Add =org-reverse-datetree-guess-date= function.
 *** 0.3.11.1 (2022-05-22)
