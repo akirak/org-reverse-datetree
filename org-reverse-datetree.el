@@ -506,7 +506,12 @@ TEXT is a heading text."
 (defun org-reverse-datetree--get-file-headers ()
   "Get the file headers of the current Org buffer."
   (require 'org-element)
-  (let ((buffer-ast (org-with-wide-buffer (org-element-parse-buffer))))
+  (let ((buffer-ast (org-with-wide-buffer
+                     (goto-char (point-min))
+                     (save-match-data
+                       (when (re-search-forward org-heading-regexp nil t)
+                         (narrow-to-region (point-min) (point))))
+                     (org-element-parse-buffer))))
     (setq org-reverse-datetree--file-headers
           (or (org-element-map buffer-ast 'keyword
                 (lambda (keyword)
