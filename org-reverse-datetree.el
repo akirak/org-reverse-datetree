@@ -1263,6 +1263,31 @@ It returns a list of results returned by the function."
             (end-of-line)))))
     (nreverse result)))
 
+(cl-defun org-reverse-datetree-dates (&key decoded)
+  "Return a list of date tree dates in the buffer."
+  (org-with-wide-buffer
+   (let ((level (org-reverse-datetree-num-levels))
+         dates)
+     (goto-char (point-min))
+     (save-match-data
+       (while (re-search-forward org-complex-heading-regexp nil t)
+         (when (= (- (match-end 1) (match-beginning 1))
+                  level)
+           (let* ((heading (match-string-no-properties 4))
+                  (decoded-time (ignore-errors
+                                  (parse-time-string heading))))
+             (when (and (nth 3 decoded-time)
+                        (nth 4 decoded-time)
+                        (nth 5 decoded-time))
+               (org-end-of-subtree)
+               (push (if decoded
+                         decoded-time
+                       (org-reverse-datetree--encode-time
+                        (append '(0 0 0)
+                                (seq-drop decoded-time 3))))
+                     dates)))))
+       dates))))
+
 (cl-defun org-reverse-datetree-guess-date (&key decoded)
   "Return the date of the current entry in the date tree, if any.
 
