@@ -23,6 +23,7 @@ activities on a particular subject using a search tool like
   - [[#configuring-date-formats][Configuring date formats]]
   - [[#defining-a-capture-template][Defining a capture template]]
   - [[#jumping-to-a-particular-date][Jumping to a particular date]]
+  - [[#calendar-integration][Calendar integration]]
   - [[#retrieving-the-current-date-in-the-date-tree][Retrieving the current date in the date tree]]
   - [[#defining-a-refile-function][Defining a refile function]]
   - [[#archiving][Archiving]]
@@ -126,6 +127,12 @@ When a new olp is created, it is ordered alphabetically (or lexicographically).
 
 *** Jumping to a particular date
 Use =org-reverse-datetree-goto-date-in-file= command to jump to a particular date in the date tree of the current file.
+*** Calendar integration
+If you run =org-reverse-datetree-calendar= from an Org file, =calendar= is shown with dates in the date tree highlighted.
+
+If you run =org-reverse-datetree-display-entry= in the calendar, a corresponding date entry in the date tree will be displayed in a window. If the date doesn't exist in the date tree, a new entry will be created.
+
+If you want to remove the highlights, run =org-reverse-datetree-unlink-calendar= command.
 *** Retrieving the current date in the date tree
 With =org-reverse-datetree-guess-date= function, you can retrieve the date of the entry at point where a date tree is effective.
 Note that this function may not work in certain situations, so it should be considered experimental.
