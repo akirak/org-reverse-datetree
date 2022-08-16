@@ -1339,7 +1339,11 @@ It returns a list of results returned by the function."
     (nreverse result)))
 
 (cl-defun org-reverse-datetree-dates (&key decoded)
-  "Return a list of date tree dates in the buffer."
+  "Return a list of date tree dates in the buffer.
+
+Unless DECODED is non-nil, the returned date is an encoded time,
+so it can be passed to other functions in `org-reverse-datetree'
+package. The encoded time will be the midnight in the day."
   (org-with-wide-buffer
    (let ((level (org-reverse-datetree-num-levels))
          dates)
@@ -1348,19 +1352,13 @@ It returns a list of results returned by the function."
        (while (re-search-forward org-complex-heading-regexp nil t)
          (when (= (- (match-end 1) (match-beginning 1))
                   level)
-           (let* ((heading (match-string-no-properties 4))
-                  (decoded-time (ignore-errors
-                                  (parse-time-string heading))))
-             (when (and (nth 3 decoded-time)
-                        (nth 4 decoded-time)
-                        (nth 5 decoded-time))
-               (org-end-of-subtree)
-               (push (if decoded
-                         decoded-time
-                       (org-reverse-datetree--encode-time
-                        (append '(0 0 0)
-                                (seq-drop decoded-time 3))))
-                     dates)))))
+           (when-let (decoded-time (org-reverse-datetree--date
+                                    (match-string-no-properties 4)))
+             (org-end-of-subtree)
+             (push (if decoded
+                       decoded-time
+                     (org-reverse-datetree--encode-date decoded-time))
+                   dates))))
        dates))))
 
 (cl-defun org-reverse-datetree-guess-date (&key decoded)
@@ -1381,18 +1379,46 @@ package. The encoded time will be the midnight in the day."
         (org-with-wide-buffer
          (when (> current-level level)
            (org-up-heading-all (- current-level level)))
-         (when-let (decoded-time (ignore-errors
-                                   (parse-time-string (org-get-heading t t t t))))
-           ;; `parse-time-string' can return a decoded time that contain no date
-           ;; fields. Check if the fourth field is non-nil.
-           (when (nth 4 decoded-time)
-             (if decoded
-                 decoded-time
-               ;; It may be better to add the offset of the current time zone. In
-               ;; that case, I would use `time-add' and `current-time-zone'.
-               (org-reverse-datetree--encode-time
-                (append '(0 0 0)
-                        (seq-drop decoded-time 3)))))))))))
+         (when-let (decoded-time (org-reverse-datetree--date))
+           (if decoded
+               decoded-time
+             (org-reverse-datetree--encode-date decoded-time))))))))
+
+(defun org-reverse-datetree-date-child-p ()
+  "Return non-nil if the entry is a direct child of a date entry."
+  (unless (org-before-first-heading-p)
+    (let ((level (org-reverse-datetree-num-levels))
+          (current-level (org-outline-level)))
+      (when (eq current-level (1+ level))
+        (save-excursion
+          (org-up-heading-all 1)
+          (and (org-reverse-datetree--date) t))))))
+
+(defun org-reverse-datetree--date (&optional heading)
+  "Return the date of the heading, if any.
+
+This function parses the date of the heading. The date string
+must contain year, month, and day of month, but the other fields
+are optional.
+
+You can optionally give an explicit HEADING as an argument.
+Otherwise, it is taken from the current Org heading."
+  (let ((decoded-time (ignore-errors
+                        (parse-time-string
+                         (or heading (org-get-heading t t t t))))))
+    ;; `parse-time-string' can return a decoded time that contain no date
+    ;; fields.
+    (when (and (nth 3 decoded-time)
+               (nth 4 decoded-time)
+               (nth 5 decoded-time))
+      decoded-time)))
+
+(defun org-reverse-datetree--encode-date (decoded-time)
+  "Return the encoded time of midnight on the date of DECODED-TIME."
+  ;; It may be better to add the offset of the current time zone. In
+  ;; that case, I would use `time-add' and `current-time-zone'.
+  (org-reverse-datetree--encode-time
+   (append '(0 0 0) (seq-drop decoded-time 3))))
 
 (defun org-reverse-datetree-num-levels ()
   "Return the number of outline levels of datetree entries.
