@@ -294,4 +294,27 @@
                 (seq-take 6)))
             :to-equal '(nil nil nil 1 4 2021))))
 
+(describe "org-reverse-datetree-date-child-p"
+
+  (it "non-nil on a direct child"
+    (expect (org-reverse-datetree-test-with-file "test/month.org"
+              (goto-char (point-min))
+              (search-forward "*** 2021-04-02 Friday")
+              (org-reverse-datetree-date-child-p))
+            :to-be nil))
+
+  (it "returns nil on a date"
+    (expect (org-reverse-datetree-test-with-file "test/month.org"
+              (goto-char (point-min))
+              (search-forward "**** B")
+              (org-reverse-datetree-date-child-p))
+            :to-be-truthy))
+
+  (it "returns nil on a descendant"
+    (expect (org-reverse-datetree-test-with-file "test/month.org"
+              (goto-char (point-min))
+              (search-forward "***** B.1")
+              (org-reverse-datetree-date-child-p))
+            :to-be nil)))
+
 (provide 'org-reverse-datetree-test)

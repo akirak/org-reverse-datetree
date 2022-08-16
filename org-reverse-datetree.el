@@ -1384,6 +1384,16 @@ package. The encoded time will be the midnight in the day."
                decoded-time
              (org-reverse-datetree--encode-date decoded-time))))))))
 
+(defun org-reverse-datetree-date-child-p ()
+  "Return non-nil if the entry is a direct child of a date entry."
+  (unless (org-before-first-heading-p)
+    (let ((level (org-reverse-datetree-num-levels))
+          (current-level (org-outline-level)))
+      (when (eq current-level (1+ level))
+        (save-excursion
+          (org-up-heading-all 1)
+          (and (org-reverse-datetree--date) t))))))
+
 (defun org-reverse-datetree--date (&optional heading)
   "Return the date of the heading, if any.
 
