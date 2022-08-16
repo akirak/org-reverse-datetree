@@ -29,6 +29,7 @@ activities on a particular subject using a search tool like
   - [[#archiving][Archiving]]
   - [[#defining-an-agenda-command][Defining an agenda command]]
   - [[#cleaning-up-empty-dates][Cleaning up empty dates]]
+  - [[#defining-a-custom-org-ql-predicate][Defining a custom org-ql predicate]]
 - [[#configuration-examples][Configuration examples]]
 - [[#changelog][Changelog]]
 - [[#license][License]]
@@ -250,6 +251,23 @@ You can also define a custom org-agenda command:
 =org-super-agenda-groups= is an option for [[https://github.com/alphapapa/org-super-agenda][org-super-agenda]] for grouping the contents. If you don't activate =org-super-agenda-mode=, that option is simply ignoerd.
 *** Cleaning up empty dates
 You can use =org-reverse-datetree-cleanup-empty-dates= command to clean up date entries that contains no children.
+*** Defining a custom org-ql predicate
+=org-reverse-datetree-date-child-p= function returns non-nil if and only if the heading is a direct child of a date heading in the date tree.
+You can use this function to define an [[https://github.com/alphapapa/org-ql][org-ql]] predicate that matches direct children of date trees:
+
+#+begin_src emacs-lisp
+  (org-ql-defpred datetree ()
+    "Return non-nil if the entry is a direct child of a date entry."
+    :body
+    (org-reverse-datetree-date-child-p))
+#+end_src
+
+The following code displays entries in the date tree using =org-ql-search=:
+
+#+begin_src emacs-lisp
+  (org-ql-search (current-buffer)
+    '(datetree))
+#+end_src
 ** Configuration examples
 - [[https://out-of-cheese-error.netlify.com/spacemacs-config#org7963676][An Annotated Spacemacs - For an org-mode workflow ·]]: Using the package in some of his =org-capture= templates for clippling URLs, notes, and tasks.
 ** Changelog
