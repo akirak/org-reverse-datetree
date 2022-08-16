@@ -276,6 +276,15 @@
                        (append '(0 0 0 1 4 2021)
                                (seq-drop (decode-time (current-time)) 6)))))
 
+  (it "returns the date when the entry is a descendant"
+    (expect (org-reverse-datetree-test-with-file "test/month.org"
+              (goto-char (point-min))
+              (search-forward "***** B.1")
+              (org-reverse-datetree-guess-date))
+            :to-equal (org-reverse-datetree--encode-time
+                       (append '(0 0 0 1 4 2021)
+                               (seq-drop (decode-time (current-time)) 6)))))
+
   (it "returns a decoded time when :decoded is non-nil"
     (expect (org-reverse-datetree-test-with-file "test/month.org"
               (goto-char (point-min))
