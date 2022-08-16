@@ -189,6 +189,47 @@
                           ("2021-01-01 Friday" "Y")
                           ("2020-08-01 Saturday" "Z"))))))
 
+(describe "org-reverse-datetree-dates"
+
+  (it "returns dates, without duplicates"
+    (expect (org-reverse-datetree-test-with-file "test/month.org"
+              (goto-char (point-min))
+              (org-reverse-datetree-dates))
+            :to-equal
+            (mapcar (pcase-lambda (`(,year ,month ,day))
+                      (org-reverse-datetree--encode-time
+                       (append (list 0 0 0 day month year)
+                               (seq-drop (decode-time (current-time)) 6))))
+                    '((2020 12 31)
+                      (2021 1 1)
+                      (2021 4 1)
+                      (2021 4 2)))))
+
+  (it ":decoded t"
+    (expect (org-reverse-datetree-test-with-file "test/month.org"
+              (goto-char (point-min))
+              (mapcar (lambda (decoded-time)
+                        (seq-take decoded-time 6))
+                      (org-reverse-datetree-dates :decoded t)))
+            :to-equal
+            (mapcar (lambda (decoded-time)
+                      (seq-take decoded-time 6))
+                    (list (parse-time-string "2020-12-31")
+                          (parse-time-string "2021-01-01")
+                          (parse-time-string "2021-04-01")
+                          (parse-time-string "2021-04-02")))))
+
+  (it "skip non-datetree"
+    (expect (org-reverse-datetree-test-with-file "test/mixed.org"
+              (goto-char (point-min))
+              (org-reverse-datetree-dates))
+            :to-equal
+            (mapcar (pcase-lambda (`(,year ,month ,day))
+                      (org-reverse-datetree--encode-time
+                       (append (list 0 0 0 day month year)
+                               (seq-drop (decode-time (current-time)) 6))))
+                    '((2020 12 31))))))
+
 (describe "org-reverse-datetree-guess-date"
 
   (it "returns nil when the entry is outside of the datetree"
