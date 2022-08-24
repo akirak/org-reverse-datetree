@@ -822,7 +822,7 @@ refile a single tree. FILE, TIME, ASK-ALWAYS, and PREFER are the
 same as in the function. ASK-ALWAYS and PREFER should be removed
 in the future.
 
-Return a string describing the operation."
+Return the effective time of the target headline."
   (let* ((time (org-reverse-datetree--entry-time-2
                 (cond
                  (time time)
@@ -838,7 +838,8 @@ Return a string describing the operation."
                      time :return 'rfloc))))
          (heading (nth 4 (org-heading-components))))
     (org-refile nil nil rfloc)
-    (format "\"%s\" -> %s" heading (car rfloc))))
+    (message (format "\"%s\" -> %s" heading (car rfloc)))
+    time))
 
 ;;;###autoload
 (cl-defun org-reverse-datetree-refile-to-file (file &optional time
@@ -858,7 +859,12 @@ take the same format (i.e. a list of patterns) as
 Alternatively, you can set TIME to t, in which case a prompt is
 shown to let the user choose a date explicitly.
 
-ASK-ALWAYS and PREFER are deprecated."
+ASK-ALWAYS and PREFER are deprecated.
+
+Unless a region is active in `org-mode' or the bulk mode is
+active in `org-agenda-mode', this function returns the effective
+time of the destination entry. If either mode is effective, nil
+is returned."
   ;; NOTE: Based on org 9.3. Maybe needs updating in the future
   (pcase (derived-mode-p 'org-mode 'org-agenda-mode)
     ('org-mode
@@ -866,8 +872,7 @@ ASK-ALWAYS and PREFER are deprecated."
          (let ((region-start (region-beginning))
                (region-end (region-end))
                (org-refile-active-region-within-subtree nil)
-               subtree-end
-               msgs)
+               subtree-end)
            (org-with-wide-buffer
             (when (file-equal-p file (buffer-file-name))
               (user-error "Can't refile to the same file"))
@@ -880,18 +885,16 @@ ASK-ALWAYS and PREFER are deprecated."
                 (org-next-visible-heading 1))
               (setq subtree-end (save-excursion
                                   (org-end-of-subtree)))
-              (push (org-reverse-datetree--refile-to-file
-                     file time :ask-always ask-always :prefer prefer)
-                    msgs)
+              (org-reverse-datetree--refile-to-file
+               file time :ask-always ask-always :prefer prefer)
               (if (<= region-end subtree-end)
                   (setq region-start nil)
                 (let ((len (- subtree-end region-start)))
                   (setq region-end (- region-end len))
                   (goto-char region-start)))))
            (let ((message-log-max nil))
-             (message "Refiled to %s:\n%s"
-                      file
-                      (string-join (nreverse msgs) "\n"))))
+             (message "Refiled to %s" file))
+           nil)
        (org-reverse-datetree--refile-to-file
         file time :ask-always ask-always :prefer prefer)))
     ('org-agenda-mode
@@ -900,8 +903,7 @@ ASK-ALWAYS and PREFER are deprecated."
                                       org-agenda-bulk-marked-entries))
            (let ((processed 0)
                  (skipped 0)
-                 (d 0)
-                 msgs)
+                 (d 0))
              (dolist (e (cl-sort (cdr group) (lambda (a b)
                                                (< (marker-position a)
                                                   (marker-position b)))))
@@ -920,9 +922,8 @@ ASK-ALWAYS and PREFER are deprecated."
                         (setq d (+ d (- (save-excursion
                                           (org-end-of-subtree))
                                         (point))))
-                        (push (org-reverse-datetree--refile-to-file
-                               file time :ask-always ask-always :prefer prefer)
-                              msgs))))
+                        (org-reverse-datetree--refile-to-file
+                         file time :ask-always ask-always :prefer prefer))))
                    ;; `post-command-hook' is not run yet.  We make sure any
                    ;; pending log note is processed.
                    (when (or (memq 'org-add-log-note (default-value 'post-command-hook))
@@ -931,12 +932,12 @@ ASK-ALWAYS and PREFER are deprecated."
                    (cl-incf processed))))
              (unless org-agenda-persistent-marks (org-agenda-bulk-unmark-all))
              (org-agenda-redo)
-             (message "Refiled %d entries to %s%s\n%s"
+             (message "Refiled %d entries to %s%s"
                       processed file
                       (if (= skipped 0)
                           ""
-                        (format ", skipped %d" skipped))
-                      (string-join (nreverse msgs) "\n"))))
+                        (format ", skipped %d" skipped)))
+             nil))
        (let* ((buffer-orig (buffer-name))
               (marker (or (org-get-at-bol 'org-hd-marker)
                           (org-agenda-error))))
