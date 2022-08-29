@@ -841,6 +841,10 @@ Return the effective time of the target headline."
     (message (format "\"%s\" -> %s" heading (car rfloc)))
     time))
 
+(defun org-reverse-datetree-default-entry-time ()
+  "Return the default expected date of the entry."
+  (org-reverse-datetree--entry-time-2))
+
 ;;;###autoload
 (cl-defun org-reverse-datetree-refile-to-file (file &optional time
                                                     &key ask-always prefer)
