@@ -274,6 +274,10 @@ The following code displays entries in the date tree using =org-ql-search=:
 :PROPERTIES:
 :TOC:      :depth 0
 :END:
+*** 0.4 (2022-08-31)
+- Add =org-reverse-datetree-date-child-p= function.
+- Add =org-reverse-datetree-default-entry-time= function.
+- =org-reverse-datetree-refile-to-file= function has been changed to return the time, unless a region is active in the =org-mode= buffer or bulk mode is active in =org-agenda-mode=.
 *** 0.3.14 (2022-08-13)
 - Add calendar integration.
 - Add =org-reverse-datetree-dates= function.
