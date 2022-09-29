@@ -313,14 +313,14 @@ tree of the date tree, like a file+olp+datetree target of
                                 (org-reverse-datetree--apply-format (-last-item level-formats) time)
                                 :asc asc)))
               (cl-case return-type
-                ('marker (point-marker))
-                ('point (point))
-                ('rfloc (list (nth 4 (org-heading-components))
-                              (buffer-file-name (or (org-base-buffer (current-buffer))
-                                                    (current-buffer)))
-                              nil
-                              (point)))
-                ('created new)))))
+                (marker (point-marker))
+                (point (point))
+                (rfloc (list (nth 4 (org-heading-components))
+                             (buffer-file-name (or (org-base-buffer (current-buffer))
+                                                   (current-buffer)))
+                             nil
+                             (point)))
+                (created new)))))
       (when-let (visibility (or (cdr (assq (or return-type 'default)
                                            org-reverse-datetree-show-context-detail))
                                 (when (not (eq return-type 'default))
