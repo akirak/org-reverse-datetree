@@ -1281,6 +1281,39 @@ calendar."
               nil nil (car (current-time-zone)))))
       (org-beginning-of-line))))
 
+(defun org-reverse-datetree-calendar-next (&optional backward)
+  "Go to the next date that has an entry."
+  (interactive)
+  (let ((calendar-date (calendar-cursor-to-date))
+        (file org-reverse-datetree-calendar-file))
+    (when-let (date (with-current-buffer (or (find-buffer-visiting file)
+                                             (find-file-noselect file))
+                      (cl-labels
+                          ((compare-dates (date1 date2)
+                             (- (calendar-absolute-from-gregorian date1)
+                                (calendar-absolute-from-gregorian date2)))
+                           (test-pred (entry-date)
+                             (if backward
+                                 (< (compare-dates entry-date calendar-date) 0)
+                               (> (compare-dates entry-date calendar-date) 0)))
+                           (sort-pred (date1 date2)
+                             (if backward
+                                 (> (compare-dates date1 date2) 0)
+                               (< (compare-dates date1 date2) 0))))
+                        (thread-last
+                          (org-reverse-datetree-dates :decoded t)
+                          (mapcar (pcase-lambda (`(,_ ,_ ,_ ,day ,month ,year . ,_))
+                                    (list month day year)))
+                          (seq-filter #'test-pred)
+                          (-sort #'sort-pred)
+                          (car)))))
+      (calendar-goto-date date))))
+
+(defun org-reverse-datetree-calendar-previous ()
+  "Go to the previous date that has an entry."
+  (interactive)
+  (org-reverse-datetree-calendar-next t))
+
 (defun org-reverse-datetree-mark-calendar ()
   "Mark the calendar entry."
   (when org-reverse-datetree-calendar-file
