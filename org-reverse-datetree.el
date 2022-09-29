@@ -71,7 +71,11 @@
   :prefix "org-reverse-datetree-")
 
 (defface org-reverse-datetree-calendar-date-face
-  '((t (:background "#481260")))
+  '((((class color) (min-colors 88) (background dark))
+     :background "#481260" :foreground "#ffffff" :bold t)
+    (((class color) (min-colors 88) (background light))
+     :background  "#eeaeee" :foreground "#000000" :bold t)
+    (t (:background "#cd5b45")))
   "Face for calendar dates."
   :group 'calendar-faces)
 
