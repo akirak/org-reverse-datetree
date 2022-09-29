@@ -4,6 +4,7 @@
 :TOC:      :include descendants :depth 2
 :END:
 [[https://melpa.org/#/org-reverse-datetree][https://melpa.org/packages/org-reverse-datetree-badge.svg]]
+[[https://stable.melpa.org/#/org-reverse-datetree][https://stable.melpa.org/packages/org-reverse-datetree-badge.svg]]
 [[https://github.com/akirak/org-reverse-datetree/workflows/CI/badge.svg][https://github.com/akirak/org-reverse-datetree/workflows/CI/badge.svg]]
 
 This package provides functions for creating reverse
