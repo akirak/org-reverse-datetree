@@ -132,6 +132,8 @@ Use =org-reverse-datetree-goto-date-in-file= command to jump to a particular dat
 *** Calendar integration
 If you run =org-reverse-datetree-calendar= from an Org file, =calendar= is shown with dates in the date tree highlighted.
 
+[[file:screenshots/calendar.png]]
+
 If you run =org-reverse-datetree-display-entry= in the calendar, a corresponding date entry in the date tree will be displayed in a window. If the date doesn't exist in the date tree, a new entry will be created.
 
 To navigate between highlighted dates in the calendar, use =org-reverse-datetree-calendar-next= and =org-reverse-datetree-calendar-previous=.
