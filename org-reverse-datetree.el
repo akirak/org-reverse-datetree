@@ -142,7 +142,7 @@ Each pattern takes one of the following expressions:
                         (const clock)
                         (choice (const latest)
                                 (const earliest)))
-                  (cons :tag "First regexp match of inactive clock"
+                  (cons :tag "First regexp match of timestamp"
                         (const match)
                         (plist :tag "Properties"
                                :option
