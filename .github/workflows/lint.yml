@@ -1,5 +1,11 @@
 name: 'package-lint'
-on: { push: { paths: [ '**.el' ] } }
+on:
+  pull_request:
+    paths:
+      - '**.el'
+  push:
+    branches: master
+  workflow_dispatch:
 jobs:
   lint:
     runs-on: ubuntu-latest

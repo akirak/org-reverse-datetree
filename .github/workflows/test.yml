@@ -1,5 +1,11 @@
 name: 'test'
-on: { push: { paths: [ '**.el' ] } }
+on:
+  pull_request:
+    paths:
+      - '**.el'
+  push:
+    branches: master
+  workflow_dispatch:
 jobs:
   test:
     runs-on: ubuntu-latest
