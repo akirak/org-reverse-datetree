@@ -1027,9 +1027,6 @@ A prefix argument FIND-DONE should be treated as in
              (tr-org-odd-levels-only org-odd-levels-only)
              (this-buffer (current-buffer))
              (current-time (current-time))
-             (time (format-time-string
-                    (substring (cdr org-time-stamp-formats) 1 -1)
-                    current-time))
              (file (or (buffer-file-name (buffer-base-buffer))
                        (error "No file associated to buffer")))
              (afile (org-reverse-datetree--archive-file file))
@@ -1040,9 +1037,12 @@ A prefix argument FIND-DONE should be treated as in
                            ((find-buffer-visiting afile))
                            ((find-file-noselect afile))
                            (t (error "Cannot access file \"%s\"" afile))))
-             (archive-time (org-reverse-datetree--encode-time
-                            (org-parse-time-string
-                             (or (org-entry-get nil "CLOSED" t) time)))))
+             (closed (org-entry-get nil "CLOSED" t))
+             (archive-time (if closed
+                               (and (string-match org-ts-regexp-inactive closed)
+                                    (org-reverse-datetree--encode-time
+                                     (org-parse-time-string (match-string 1 closed))))
+                             current-time)))
         (save-excursion
           (org-back-to-heading t)
           ;; Get context information that will be lost by moving the
