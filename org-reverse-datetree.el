@@ -1064,7 +1064,12 @@ A prefix argument FIND-DONE should be treated as in
                     (olpath . ,(mapconcat #'identity
                                           (org-get-outline-path)
                                           "/"))
-                    (time . ,time)
+                    (time . ,(format-time-string
+                              (thread-last
+                                (org-time-stamp-format t)
+                                (string-remove-prefix "<")
+                                (string-remove-suffix ">"))
+                              current-time))
                     (todo . ,(org-entry-get (point) "TODO")))))
             ;; We first only copy, in case something goes wrong
             ;; we need to protect `this-command', to avoid kill-region sets it,
