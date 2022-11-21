@@ -571,6 +571,9 @@ TEXT is a heading text."
   "Insert a pair of KEY and VALUE into the file header."
   (org-with-wide-buffer
    (goto-char (point-min))
+   (when (looking-at org-property-drawer-re)
+     (goto-char (match-end 0))
+     (beginning-of-line 2))
    (if (re-search-forward (concat (rx bol "#+")
                                   (regexp-quote key)
                                   (rx ":" (1+ space)))
