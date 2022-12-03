@@ -287,6 +287,14 @@ The following code displays entries in the date tree using =org-ql-search=:
 :PROPERTIES:
 :TOC:      :depth 0
 :END:
+*** 0.4.2 (2022-12-03)
+- Allow overriding org-read-date-prefer-future for the package. (See =org-reverse-datetree-prefer-future= custom variable)
+- If =org-use-effective-time= is non-nil, consider =org-extend-today-until= for determining the target date
+- Bugfix: Don't depend on org-time-stamp-formats to support Org 9.6
+- Bugfix: Don't throw an error when run in a file without a datetree
+- Bugfix: Restore the archive time
+- Bugfix: Skip the property drawer when inserting a new header
+- Require Emacs 28.1 and Org 9.5 as minimum dependencies
 *** 0.4.1 (2022-09-30)
 - Add =org-reverse-datetree-calendar-next= and =org-reverse-datetree-calendar-previous= commands.
 - Fix the face of calendar highlights to support light background.
