@@ -292,6 +292,10 @@ The format can be either a function or a string."
     (string (format-time-string format time))
     (function (funcall format time))))
 
+(defun org-reverse-datetree--effective-time ()
+  (let ((org-use-last-clock-out-time-as-effective-time nil))
+    (org-current-effective-time)))
+
 ;;;###autoload
 (cl-defun org-reverse-datetree-2 (time level-formats
                                        &optional return-type
@@ -391,7 +395,7 @@ creates month trees.
 For RETURN, see the documentation of `org-reverse-datetree-2'."
   (unless (derived-mode-p 'org-mode)
     (user-error "Not in org-mode"))
-  (let ((time (or time (current-time)))
+  (let ((time (or time (org-reverse-datetree--effective-time)))
         (level-formats (org-reverse-datetree--level-formats
                         (if week-tree
                             'week
@@ -1029,7 +1033,7 @@ A prefix argument FIND-DONE should be treated as in
              (tr-org-todo-line-regexp org-todo-line-regexp)
              (tr-org-odd-levels-only org-odd-levels-only)
              (this-buffer (current-buffer))
-             (current-time (current-time))
+             (current-time (org-reverse-datetree--effective-time))
              (file (or (buffer-file-name (buffer-base-buffer))
                        (error "No file associated to buffer")))
              (afile (org-reverse-datetree--archive-file file))
@@ -1195,7 +1199,7 @@ A prefix argument FIND-DONE should be treated as in
 
 (defun org-reverse-datetree-last-dow (n &optional time)
   "Get the date on N th day of week in the same week as TIME."
-  (let* ((time (or time (current-time)))
+  (let* ((time (or time (org-reverse-datetree--effective-time)))
          (x (- (org-reverse-datetree--dow time) n)))
     (time-add time (- (* 86400 (if (>= x 0) x (+ x 7)))))))
 
