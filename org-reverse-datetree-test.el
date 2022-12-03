@@ -56,7 +56,8 @@
 
 (describe "org-reverse-datetree--entry-time-2"
   (describe "Default"
-    (let ((results (with-temp-buffer
+    (let ((org-use-effective-time nil)
+          (results (with-temp-buffer
                      (insert-file-contents "test/time.org")
                      ;; (setq buffer-file-name "test/time.org")
                      (org-mode)
@@ -78,6 +79,24 @@
                 :to-equal
                 (org-reverse-datetree--encode-time
                  (list 0 5 2 20 1 2022 nil nil nil))))))
+
+  (describe "org-use-effective-time is t"
+    (it "Consider org-extend-today-until"
+      (expect (let ((org-use-effective-time t)
+                    (org-extend-today-until 5))
+                (with-temp-buffer
+                  (insert-file-contents "test/time.org")
+                  ;; (setq buffer-file-name "test/time.org")
+                  (org-mode)
+                  (goto-char (point-min))
+                  (let ((org-reverse-datetree-entry-time
+                         (eval (car (get 'org-reverse-datetree-entry-time
+                                         'standard-value)))))
+                    (re-search-forward (rx bol "** Child"))
+                    (org-reverse-datetree--entry-time-2))))
+              :to-equal
+              (org-reverse-datetree--encode-time
+               (list 0 59 23 19 1 2022 nil nil nil)))))
 
   (describe "With an argument"
     (let ((result (with-temp-buffer

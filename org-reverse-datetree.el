@@ -296,6 +296,21 @@ The format can be either a function or a string."
   (let ((org-use-last-clock-out-time-as-effective-time nil))
     (org-current-effective-time)))
 
+(defun org-reverse-datetree--to-effective-time (time)
+  "Return an effective time for TIME."
+  (if org-use-effective-time
+      (let ((decoded (decode-time time)))
+        (if (and org-extend-today-until
+                 (< (nth 2 decoded) org-extend-today-until))
+            (progn
+              (setf (nth 2 decoded) 23)
+              (setf (nth 1 decoded) 59)
+              (setf (nth 0 decoded) 0)
+              (cl-decf (nth 3 decoded))
+              (org-reverse-datetree--encode-time decoded))
+          time))
+    time))
+
 ;;;###autoload
 (cl-defun org-reverse-datetree-2 (time level-formats
                                        &optional return-type
@@ -798,12 +813,15 @@ TIME can take the same value as
             (when-let (times (-some (lambda (property)
                                       (org-entry-get nil property))
                                     props))
-              (throw 'entry-time (org-reverse-datetree--timestamp-to-time times))))
+              (throw 'entry-time (org-reverse-datetree--to-effective-time
+                                  (org-reverse-datetree--timestamp-to-time times)))))
            (`(clock ,order)
             (when-let (clocks (org-reverse-datetree--clocks))
-              (throw 'entry-time (cl-ecase order
-                                   (latest (car (-sort (-not #'time-less-p) clocks)))
-                                   (earliest (car (-sort #'time-less-p clocks)))))))
+              (throw 'entry-time (when-let (time
+                                            (cl-ecase order
+                                              (latest (car (-sort (-not #'time-less-p) clocks)))
+                                              (earliest (car (-sort #'time-less-p clocks)))))
+                                   (org-reverse-datetree--to-effective-time time)))))
            (`(match . ,plist)
             (let ((regexp (pcase (plist-get plist :type)
                             ('any org-ts-regexp-both)
@@ -814,8 +832,9 @@ TIME can take the same value as
               (save-excursion
                 (org-back-to-heading)
                 (when (re-search-forward regexp bound t)
-                  (throw 'entry-time (org-reverse-datetree--timestamp-to-time
-                                      (match-string 1)))))))
+                  (throw 'entry-time (org-reverse-datetree--to-effective-time
+                                      (org-reverse-datetree--timestamp-to-time
+                                       (match-string 1))))))))
            (_ (error "Unknown pattern: %s" x))))
        (org-reverse-datetree--read-date)))
     (_
