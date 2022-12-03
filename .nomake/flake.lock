@@ -35,11 +35,11 @@
     "org": {
       "flake": false,
       "locked": {
-        "lastModified": 1665899000,
-        "narHash": "sha256-LE2+QiHxUQ1GIHGHROODWlnJMC3hO/XIaBAq1uiM0zY=",
+        "lastModified": 1669960764,
+        "narHash": "sha256-5dTYHxz7R9a0CHZFIpA3T5r08naXgme6DcGxsksBcOM=",
         "ref": "bugfix",
-        "rev": "58a46fab0d317ecc106ec5d326ecf04395a30052",
-        "revCount": 24665,
+        "rev": "4564627415b1e609acdddd6e92b33d51c8e427c1",
+        "revCount": 25831,
         "type": "git",
         "url": "git://git.sv.gnu.org/emacs/org-mode.git"
       },
@@ -52,11 +52,11 @@
     "org-reverse-datetree": {
       "flake": false,
       "locked": {
-        "lastModified": 1668445988,
-        "narHash": "sha256-LqDdiq9OWtv+TqN70/iUkenyKIK5eUVCrxxzGJbNaUw=",
+        "lastModified": 1669011971,
+        "narHash": "sha256-hg2KvtwQTpszJbsh7uCf6+ShUXa/0OaIWFX9E747X0w=",
         "owner": "akirak",
         "repo": "org-reverse-datetree",
-        "rev": "67aecbbb55b2e0d1c435e686ac46c37038a981d0",
+        "rev": "127b168960296861f73f8e38247438ebdc575d1e",
         "type": "github"
       },
       "original": {
