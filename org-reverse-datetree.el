@@ -4,7 +4,7 @@
 
 ;; Author: Akira Komamura <akira.komamura@gmail.com>
 ;; Version: 0.4.2-pre
-;; Package-Requires: ((emacs "26.1") (dash "2.12") (org "9.3"))
+;; Package-Requires: ((emacs "28.1") (dash "2.19") (org "9.5"))
 ;; Keywords: outlines
 ;; URL: https://github.com/akirak/org-reverse-datetree
 
@@ -363,7 +363,7 @@ tree of the date tree, like a file+olp+datetree target of
                                 (when (not (eq return-type 'default))
                                   (cdr (assq 'default
                                              org-reverse-datetree-show-context-detail)))))
-        (org-show-set-visibility visibility)))))
+        (org-fold-show-set-visibility visibility)))))
 
 ;;;###autoload
 (cl-defun org-reverse-datetree-1 (&optional time
@@ -1006,8 +1006,8 @@ A prefix argument FIND-DONE should be treated as in
 `org-archive-subtree'."
   (interactive "P")
   (require 'org-archive)
-  (unless (fboundp 'org-show-all)
-    (user-error "This function requires `org-show-all' but it is unavailable"))
+  (unless (fboundp 'org-fold-show-all)
+    (user-error "This function requires `org-fold-show-all' but it is unavailable"))
   (if (and (org-region-active-p) org-loop-over-headlines-in-active-region)
       (let ((cl (if (eq org-loop-over-headlines-in-active-region 'start-level)
         	    'region-start-level 'region))
@@ -1103,10 +1103,10 @@ A prefix argument FIND-DONE should be treated as in
                        org-odd-levels-only
                      tr-org-odd-levels-only)))
               (goto-char (point-min))
-              ;; TODO: Find an alternative to `org-show-all'.
-              ;; org-show-all is unavailable in the Org shipped with
+              ;; TODO: Find an alternative to `org-fold-show-all'.
+              ;; org-fold-show-all is unavailable in the Org shipped with
               ;; Emacs 26.3.
-              (org-show-all '(headings blocks))
+              (org-fold-show-all '(headings blocks))
               ;; Paste
               ;; Append to the date tree
               (org-end-of-subtree)
