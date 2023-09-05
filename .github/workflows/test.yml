@@ -10,7 +10,7 @@ jobs:
     - uses: purcell/setup-emacs@master
       with:
         version: ${{ matrix.emacs_version }}
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Install dependencies
       run: |
         cat <(jq -r '.nodes.root.inputs | map(.) | .[]' .nomake/flake.lock) \
