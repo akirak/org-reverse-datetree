@@ -901,7 +901,7 @@ Return the effective time of the target headline."
                      time :return 'rfloc))))
          (heading (nth 4 (org-heading-components))))
     (org-refile nil nil rfloc)
-    (message (format "\"%s\" -> %s" heading (car rfloc)))
+    (message "\"%s\" -> %s" heading (car rfloc))
     time))
 
 (defun org-reverse-datetree-default-entry-time ()
