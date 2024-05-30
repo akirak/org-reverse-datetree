@@ -287,6 +287,9 @@ The following code displays entries in the date tree using =org-ql-search=:
 :PROPERTIES:
 :TOC:      :depth 0
 :END:
+*** 0.4.2.1 (2024-05-30)
+- Fix usage of ~message~. Thank you [[https://github.com/leotaku][Leo Gaskin]] (@leotaku). ([[https://github.com/akirak/org-reverse-datetree/pull/60][#60]])
+- Require Emacs 29.1.
 *** 0.4.2 (2022-12-03)
 - Allow overriding org-read-date-prefer-future for the package. (See =org-reverse-datetree-prefer-future= custom variable)
 - If =org-use-effective-time= is non-nil, consider =org-extend-today-until= for determining the target date
