@@ -356,10 +356,10 @@ tree of the date tree, like a file+olp+datetree target of
                                            (list olp)))
             (goto-char (point-min)))
           (let ((parent-level (length olp)))
-            (cl-loop for (level . format) in (-zip (number-sequence
-                                                    (+ parent-level 1)
-                                                    (+ parent-level (length level-formats)))
-                                                   (-butlast level-formats))
+            (cl-loop for (level . format) in (-zip-pair (number-sequence
+                                                         (+ parent-level 1)
+                                                         (+ parent-level (length level-formats)))
+                                                        (-butlast level-formats))
                      do (funcall org-reverse-datetree-find-function
                                  level
                                  (org-reverse-datetree--apply-format format time)
@@ -786,8 +786,8 @@ OLP must be a list of strings."
     (pcase-dolist
         (`(,level . ,text)
          (-drop (length existing)
-                (-zip (number-sequence 1 (length olp))
-                      olp)))
+                (-zip-pair (number-sequence 1 (length olp))
+                           olp)))
       (funcall org-reverse-datetree-find-function
                level text :asc t))))
 
