@@ -325,17 +325,17 @@ See `org-reverse-datetree-level-formats' for the data type.
 Depending on the value of RETURN-TYPE, this function returns the
 following values:
 
-\"'marker\":
+\='marker
   Returns the marker of the subtree.
 
-\"point\"
+\='point
   Returns point of subtree.
 
-\"rfloc\"
+\='rfloc
   Returns a refile location spec that can be used as the third
   argument of `org-refile' function.
 
-\"created\"
+\='created
   Returns non-nil if and only if a new tree is created.
 
 If ASC is non-nil, it creates a non-reverse date tree.
