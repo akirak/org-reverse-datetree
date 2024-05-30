@@ -1,6 +1,6 @@
 ;;; org-reverse-datetree.el --- Create reverse date trees in org-mode -*- lexical-binding: t -*-
 
-;; Copyright (C) 2018-2020,2021,2022 Akira Komamura
+;; Copyright (C) 2018-2020,2021,2022,2024 Akira Komamura
 
 ;; Author: Akira Komamura <akira.komamura@gmail.com>
 ;; Version: 0.4.2
