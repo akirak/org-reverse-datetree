@@ -1,10 +1,10 @@
 ;;; org-reverse-datetree.el --- Create reverse date trees in org-mode -*- lexical-binding: t -*-
 
-;; Copyright (C) 2018-2020,2021,2022 Akira Komamura
+;; Copyright (C) 2018-2020,2021,2022,2024 Akira Komamura
 
 ;; Author: Akira Komamura <akira.komamura@gmail.com>
 ;; Version: 0.4.2
-;; Package-Requires: ((emacs "28.1") (dash "2.19") (org "9.5"))
+;; Package-Requires: ((emacs "29.1") (dash "2.19.1") (org "9.6"))
 ;; Keywords: outlines
 ;; URL: https://github.com/akirak/org-reverse-datetree
 
@@ -325,17 +325,17 @@ See `org-reverse-datetree-level-formats' for the data type.
 Depending on the value of RETURN-TYPE, this function returns the
 following values:
 
-\"'marker\":
+\='marker
   Returns the marker of the subtree.
 
-\"point\"
+\='point
   Returns point of subtree.
 
-\"rfloc\"
+\='rfloc
   Returns a refile location spec that can be used as the third
   argument of `org-refile' function.
 
-\"created\"
+\='created
   Returns non-nil if and only if a new tree is created.
 
 If ASC is non-nil, it creates a non-reverse date tree.
@@ -356,10 +356,10 @@ tree of the date tree, like a file+olp+datetree target of
                                            (list olp)))
             (goto-char (point-min)))
           (let ((parent-level (length olp)))
-            (cl-loop for (level . format) in (-zip (number-sequence
-                                                    (+ parent-level 1)
-                                                    (+ parent-level (length level-formats)))
-                                                   (-butlast level-formats))
+            (cl-loop for (level . format) in (-zip-pair (number-sequence
+                                                         (+ parent-level 1)
+                                                         (+ parent-level (length level-formats)))
+                                                        (-butlast level-formats))
                      do (funcall org-reverse-datetree-find-function
                                  level
                                  (org-reverse-datetree--apply-format format time)
@@ -786,8 +786,8 @@ OLP must be a list of strings."
     (pcase-dolist
         (`(,level . ,text)
          (-drop (length existing)
-                (-zip (number-sequence 1 (length olp))
-                      olp)))
+                (-zip-pair (number-sequence 1 (length olp))
+                           olp)))
       (funcall org-reverse-datetree-find-function
                level text :asc t))))
 
