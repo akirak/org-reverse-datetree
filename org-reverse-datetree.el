@@ -852,6 +852,9 @@ TIME can take the same value as
       (when logbook-end
         (let (entries)
           (while (re-search-forward org-clock-line-re logbook-end t)
+            ;; org-element-clock-parser should be called at or before the clock
+            ;; entry.
+            (goto-char (match-beginning 0))
             (let ((clock (org-element-clock-parser (line-end-position))))
               (when (and (eq 'clock (org-element-type clock))
                          (eq 'closed (org-element-property :status clock)))
@@ -873,7 +876,8 @@ TIME can take the same value as
                                (org-element-property :month-end timestamp)
                                (org-element-property :year-end timestamp)
                                nil nil nil))
-                        entries)))))
+                        entries)))
+              (end-of-line 1)))
           entries)))))
 
 (cl-defun org-reverse-datetree--refile-to-file (file &optional time
