@@ -24,16 +24,16 @@ arch := shell('nix eval --expr builtins.currentSystem --impure --raw')
 
 # Show the flake
 show *OPTIONS:
-    nix flake show {{ rice-config }} {{ OPTIONS }} {{ common-options-with-lock }} --override-input systems github:nix-systems/{{ arch }} --allow-import-from-derivation
+    nix flake show {{ rice-config }} {{ OPTIONS }} {{ common-options-with-lock }}
 
 # Evaluate an attribute on the flake, e.g. just eval melpaRecipes.
 eval ATTR *OPTIONS:
-    nix eval {{rice-config}}\#{{ATTR}} {{OPTIONS}} {{ common-options-with-lock }} --override-input systems github:nix-systems/{{ arch }} --allow-import-from-derivation
+    nix eval {{rice-config}}\#{{ATTR}} {{OPTIONS}} {{ common-options-with-lock }}
 
 # Generate a lock directory.
 lock *OPTIONS:
     mkdir -p "$(dirname {{ lock-dir }})"
-    nix run "{{ rice-config }}?dir=make-lock#lock-with-{{ emacs }}" {{ common-options-without-lock }} --impure -- {{ OPTIONS }} {{ lock-dir }}
+    nix run "{{ rice-config }}#{{ emacs }}-with-packages.generateLockDir" {{ common-options-without-lock }} --impure -- {{ OPTIONS }} {{ lock-dir }}
 
 # Enter a shell for byte-compiling individual source files
 shell-compile:
