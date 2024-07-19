@@ -1,0 +1,18 @@
+name: Check Emacs Lisp
+on:
+  pull_request:
+    paths-ignore:
+      - 'README.*'
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - 'README.*'
+  workflow_dispatch:
+jobs:
+  compile-and-test:
+    uses: emacs-twist/elisp-workflows/.github/workflows/compile-and-test.yml@compile-and-test
+    with:
+      systems: github:nix-systems/x86_64-linux
+  # melpazoid:
+  #   uses: emacs-twist/elisp-workflows/.github/workflows/melpazoid.yml@master
