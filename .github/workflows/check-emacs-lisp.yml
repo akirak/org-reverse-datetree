@@ -11,8 +11,8 @@ on:
   workflow_dispatch:
 jobs:
   compile-and-test:
-    uses: emacs-twist/elisp-workflows/.github/workflows/compile-and-test.yml@compile-and-test
+    uses: emacs-twist/elisp-workflows/.github/workflows/compile-and-test.yml@master
     with:
       systems: github:nix-systems/x86_64-linux
-  # melpazoid:
-  #   uses: emacs-twist/elisp-workflows/.github/workflows/melpazoid.yml@master
+  melpazoid:
+    uses: emacs-twist/elisp-workflows/.github/workflows/melpazoid.yml@master
