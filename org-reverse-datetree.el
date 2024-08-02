@@ -902,10 +902,8 @@ Return the effective time of the target headline."
                         (find-file-noselect file))
                   (save-excursion
                     (org-reverse-datetree-goto-date-in-file
-                     time :return 'rfloc))))
-         (heading (nth 4 (org-heading-components))))
+                     time :return 'rfloc)))))
     (org-refile nil nil rfloc)
-    (message "\"%s\" -> %s" heading (car rfloc))
     time))
 
 (defun org-reverse-datetree-default-entry-time ()
