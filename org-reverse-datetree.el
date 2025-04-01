@@ -377,11 +377,11 @@ tree of the date tree, like a file+olp+datetree target of
                              nil
                              (point)))
                 (created new)))))
-      (when-let (visibility (or (cdr (assq (or return-type 'default)
+      (when-let* ((visibility (or (cdr (assq (or return-type 'default)
                                            org-reverse-datetree-show-context-detail))
                                 (when (not (eq return-type 'default))
                                   (cdr (assq 'default
-                                             org-reverse-datetree-show-context-detail)))))
+                                             org-reverse-datetree-show-context-detail))))))
         (org-fold-show-set-visibility visibility)))))
 
 ;;;###autoload
@@ -666,7 +666,7 @@ as the default value, inserts the value, and returns the value.
 
 If FAIL-IF-MISSING is non-nil and the key does not exist, this
 function returns nil."
-  (if-let ((value (org-reverse-datetree--lookup-header key)))
+  (if-let* ((value (org-reverse-datetree--lookup-header key)))
       (org-reverse-datetree--parse-format (string-trim value))
     (unless fail-if-missing
       (let* ((raw (read-string prompt initial))
@@ -680,7 +680,7 @@ function returns nil."
 This function looks up KEY from the file headers.  If the key is
 not contained, it asks for a new value with PROMPT with INITIAL
 as the default value, inserts the value, and returns the value."
-  (if-let ((value (org-reverse-datetree--lookup-header key)))
+  (if-let* ((value (org-reverse-datetree--lookup-header key)))
       (string-trim value)
     (let ((ret (read-string prompt initial)))
       (org-reverse-datetree--insert-header key ret)
@@ -696,7 +696,7 @@ not contained, it asks for a new value with PROMPT, inserts the
 value, and returns the value.
 
 If ABBREVIATE is non-nil, abbreviate the file name."
-  (if-let ((value (org-reverse-datetree--lookup-header key)))
+  (if-let* ((value (org-reverse-datetree--lookup-header key)))
       (string-trim value)
     (let ((ret (read-file-name prompt)))
       (org-reverse-datetree--insert-header
@@ -804,17 +804,17 @@ TIME can take the same value as
        (dolist (x (copy-sequence time))
          (pcase x
            (`(property . ,props)
-            (when-let (times (-some (lambda (property)
+            (when-let* ((times (-some (lambda (property)
                                       (org-entry-get nil property))
-                                    props))
+                                    props)))
               (throw 'entry-time (org-reverse-datetree--to-effective-time
                                   (org-reverse-datetree--timestamp-to-time times)))))
            (`(clock ,order)
-            (when-let (clocks (org-reverse-datetree--clocks))
-              (throw 'entry-time (when-let (time
+            (when-let* ((clocks (org-reverse-datetree--clocks)))
+              (throw 'entry-time (when-let* ((time
                                             (cl-ecase order
                                               (latest (car (-sort (-not #'time-less-p) clocks)))
-                                              (earliest (car (-sort #'time-less-p clocks)))))
+                                              (earliest (car (-sort #'time-less-p clocks))))))
                                    (org-reverse-datetree--to-effective-time time)))))
            (`(match . ,plist)
             (let ((regexp (pcase (plist-get plist :type)
@@ -1350,27 +1350,27 @@ calendar."
   (interactive)
   (let ((calendar-date (calendar-cursor-to-date))
         (file org-reverse-datetree-calendar-file))
-    (when-let (date (with-current-buffer (or (find-buffer-visiting file)
-                                             (find-file-noselect file))
-                      (cl-labels
-                          ((compare-dates (date1 date2)
-                             (- (calendar-absolute-from-gregorian date1)
-                                (calendar-absolute-from-gregorian date2)))
-                           (test-pred (entry-date)
-                             (if backward
-                                 (< (compare-dates entry-date calendar-date) 0)
-                               (> (compare-dates entry-date calendar-date) 0)))
-                           (sort-pred (date1 date2)
-                             (if backward
-                                 (> (compare-dates date1 date2) 0)
-                               (< (compare-dates date1 date2) 0))))
-                        (thread-last
-                          (org-reverse-datetree-dates :decoded t)
-                          (mapcar (pcase-lambda (`(,_ ,_ ,_ ,day ,month ,year . ,_))
-                                    (list month day year)))
-                          (seq-filter #'test-pred)
-                          (-sort #'sort-pred)
-                          (car)))))
+    (when-let* ((date (with-current-buffer (or (find-buffer-visiting file)
+                                               (find-file-noselect file))
+                        (cl-labels
+                            ((compare-dates (date1 date2)
+                               (- (calendar-absolute-from-gregorian date1)
+                                  (calendar-absolute-from-gregorian date2)))
+                             (test-pred (entry-date)
+                               (if backward
+                                   (< (compare-dates entry-date calendar-date) 0)
+                                 (> (compare-dates entry-date calendar-date) 0)))
+                             (sort-pred (date1 date2)
+                               (if backward
+                                   (> (compare-dates date1 date2) 0)
+                                 (< (compare-dates date1 date2) 0))))
+                          (thread-last
+                            (org-reverse-datetree-dates :decoded t)
+                            (mapcar (pcase-lambda (`(,_ ,_ ,_ ,day ,month ,year . ,_))
+                                      (list month day year)))
+                            (seq-filter #'test-pred)
+                            (-sort #'sort-pred)
+                            (car))))))
       (calendar-goto-date date))))
 
 (defun org-reverse-datetree-calendar-previous ()
@@ -1454,8 +1454,8 @@ package. The encoded time will be the midnight in the day."
        (while (re-search-forward org-complex-heading-regexp nil t)
          (when (= (- (match-end 1) (match-beginning 1))
                   level)
-           (when-let (decoded-time (org-reverse-datetree--date
-                                    (match-string-no-properties 4)))
+           (when-let* ((decoded-time (org-reverse-datetree--date
+                                      (match-string-no-properties 4))))
              (org-end-of-subtree)
              (push (if decoded
                        decoded-time
@@ -1481,7 +1481,7 @@ package. The encoded time will be the midnight in the day."
         (org-with-wide-buffer
          (when (> current-level level)
            (org-up-heading-all (- current-level level)))
-         (when-let (decoded-time (org-reverse-datetree--date))
+         (when-let* ((decoded-time (org-reverse-datetree--date)))
            (if decoded
                decoded-time
              (org-reverse-datetree--encode-date decoded-time))))))))
@@ -1489,7 +1489,7 @@ package. The encoded time will be the midnight in the day."
 (defun org-reverse-datetree-date-child-p ()
   "Return non-nil if the entry is a direct child of a date entry."
   (unless (org-before-first-heading-p)
-    (when-let (level (org-reverse-datetree-num-levels))
+    (when-let* ((level (org-reverse-datetree-num-levels)))
       (when (= (org-outline-level)
                (1+ level))
         (save-excursion
