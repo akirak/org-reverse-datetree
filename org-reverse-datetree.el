@@ -569,22 +569,16 @@ TEXT is a heading text."
 
 (defun org-reverse-datetree--get-file-headers ()
   "Get the file headers of the current Org buffer."
-  (require 'org-element)
-  (let ((buffer-ast (org-with-wide-buffer
-                     (goto-char (point-min))
-                     (save-match-data
-                       (when (re-search-forward org-heading-regexp nil t)
-                         (narrow-to-region (point-min) (point))))
-                     (org-element-parse-buffer))))
-    (setq org-reverse-datetree--file-headers
-          (or (org-element-map buffer-ast 'keyword
-                (lambda (keyword)
-                  (cons (org-element-property :key keyword)
-                        (org-element-property :value keyword))))
-              ;; If the file has no header, set the value to a
-              ;; meaningless item to indicate that the headers have
-              ;; already been read.
-              '(("" . t))))))
+  (org-with-wide-buffer
+   (goto-char (point-min))
+   (let (result)
+     ;; This can contain unwanted keywords such as RESULTS, begin (for dynamic
+     ;; blocks), etc., but they don't interfere with this package anyway.
+     (while (re-search-forward org-keyword-regexp nil t)
+       (push (cons (match-string-no-properties 1)
+                   (match-string-no-properties 2))
+             result))
+     (setq org-reverse-datetree--file-headers result))))
 
 (defun org-reverse-datetree--insert-header (key value)
   "Insert a pair of KEY and VALUE into the file header."
