@@ -184,6 +184,20 @@ in the Org header."
 
 (make-variable-buffer-local 'org-reverse-datetree-level-formats)
 
+(defcustom org-reverse-datetree-archive-file nil
+  "File name for archiving entries.
+
+This variable is used as the destination of
+`org-reverse-datetree-archive-subtree'.
+
+If the variable is nil, @='REVERSE_DATETREE_ARCHIVE_FILE
+property (either in an Org entry of the header of the Org file) will be
+used instead. If none of the variable is nil, the function will ask for
+a file name via an interactive prompt."
+  :group 'org-reverse-datetree
+  :type '(choice (const nil)
+                 (file :tag "Name of an Org file")))
+
 (defcustom org-reverse-datetree-show-context-detail
   '((default . ancestors))
   "Alist that defines how to show the context of the date entry.
@@ -1022,7 +1036,11 @@ is returned."
   "An org-reverse-datetree equivalent to `org-archive-subtree'.
 
 A prefix argument FIND-DONE should be treated as in
-`org-archive-subtree'."
+`org-archive-subtree'.
+
+To customize the file to which the subtree is archived, set
+`org-reverse-datetree-archive-file' variable or set
+@'REVERSE_DATETREE_ARCHIVE_FILE property in the file header."
   (interactive "P")
   (require 'org-archive)
   (unless (fboundp 'org-fold-show-all)
@@ -1192,7 +1210,8 @@ A prefix argument FIND-DONE should be treated as in
 (defun org-reverse-datetree--archive-file (origin-file)
   "Retrieve the name of the archive file, relative from ORIGIN-FILE."
   (let ((pname "REVERSE_DATETREE_ARCHIVE_FILE"))
-    (or (org-entry-get-with-inheritance pname)
+    (or org-reverse-datetree-archive-file
+        (org-entry-get-with-inheritance pname)
         (org-reverse-datetree--lookup-file-name-header
          pname "Select an archive file: " :abbreviate origin-file))))
 
