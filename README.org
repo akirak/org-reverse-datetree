@@ -235,8 +235,11 @@ The following snippet is a naive implementation of a function which migrates ent
 You can archive a tree to a reverse datetree using =org-reverse-datetree-archive-subtree= command.
 It also works on multiple trees in an active region.
 
-The destination is specified in either =REVERSE_DATETREE_ARCHIVE_FILE= property (inherited) or =REVERSE_DATETREE_ARCHIVE_FILE= file header. It should be a file path.
-For now, the target file cannot contain multiple date trees.
+The default destination can be customized by either setting
+=org-reverse-datetree-archive-file= custom variable or
+=REVERSE_DATETREE_ARCHIVE_FILE= property. The value should be a file path. The
+property can be set in an entry property (inherited) or in the file header.
+If none of the them are set, the function interactively prompts for a file name.
 
 From inside =org-agenda=, you can use =org-reverse-datetree-agenda-archive=.
 It doesn't work on bulk entries for now.
