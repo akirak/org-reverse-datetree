@@ -290,6 +290,8 @@ The following code displays entries in the date tree using =org-ql-search=:
 :PROPERTIES:
 :TOC:      :depth 0
 :END:
+*** 0.4.4 (2025-05-13)
+- Add ~org-reverse-datetree-archive-file~ custom variable (requested by [[https://github.com/hanschen][Hans Chen]], see [[https://github.com/akirak/org-reverse-datetree/issues/74][#74]]).
 *** 0.4.3 (2025-04-01)
 - Parse datetree settings from the entire buffer (requested by Brad Stewart, a.k.a. ~@bradmont~)
 - Stop using ~if-let~ and ~when-let~ which are to be deprecated on Emacs 31.
