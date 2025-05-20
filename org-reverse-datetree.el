@@ -567,17 +567,16 @@ asterisks and a space.
 
 TEXT is a heading text."
   ;; If the point is not at bol
-  (unless (looking-at (rx bol))
+  (unless (bolp)
     ;; If there is a blank line after the point
     (if (looking-at (rx (>= 2 "\n")))
         ;; Go to the bol immediately after the point
         (forward-char 1)
       ;; Ensure a new line is inserted
-      (insert "\n")))
-  (insert (if (org--blank-before-heading-p)
-              "\n"
-            "")
-          prefix text))
+      (newline)))
+  (when (org--blank-before-heading-p)
+    (org-open-line))
+  (insert prefix text))
 
 ;;;; Retrieving configuration from the file header
 
