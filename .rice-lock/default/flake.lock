@@ -19,11 +19,11 @@
     "dash": {
       "flake": false,
       "locked": {
-        "lastModified": 1755165091,
-        "narHash": "sha256-X1ugYAPFgoQoD6teyvGoqcfEau6Jp2akci2fAMgYkS0=",
+        "lastModified": 1760611661,
+        "narHash": "sha256-DjUHlCKt1mX72ahkxZxHywyw5pcS1JSFB2Rr+gnIGlQ=",
         "owner": "magnars",
         "repo": "dash.el",
-        "rev": "af5ea5d8a13735fa27d2c3e6f756d065639a7b45",
+        "rev": "fb443e7a6e660ba849cafcd01021d9aac3ac6764",
         "type": "github"
       },
       "original": {
